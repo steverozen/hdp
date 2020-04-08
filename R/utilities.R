@@ -48,8 +48,6 @@ randnumtable <- function(weights,maxtable){
 
   cat("rnt:", paste(maxtable, collapse = " "), "\n", sep = "")
 
-  stirling.memo <- list()
-
   numtable <- rep(0, length(maxtable))
   B <- unique(sort(maxtable))
   J <- match(maxtable, B)
@@ -60,13 +58,7 @@ randnumtable <- function(weights,maxtable){
     maxtable <- B[ii]
     if (maxtable > 0){
       mm <- 1:maxtable
-      # if (is.null(stirling.memo[[maxtable]])) {
-      if (is.null(stirling.memo[maxtable][[1]])) {
-        # stirnum <- stirling(maxtable)
-        stirnum <- stir.closure(maxtable)
-      } else {
-        stirnum <- stirling.memo[[maxtable]]
-      }
+      stirnum <- stir.closure(maxtable)
       for (jj in which(J == ii)){
         clik <- mm * weights[jj]
         clik <- cumsum(stirnum * exp(clik - max(clik)))
