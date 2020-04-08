@@ -1,6 +1,8 @@
 # func to calculate the unsigned stirling numbers of the first kind.
 stirling <- function(nn){
 
+  cat("s:", nn, "\n", sep = "")
+
   if (!exists("maxnn", where=parent.frame(2))){
     assign("maxnn", 1, envir=parent.frame(2))
     assign("allss", list(1), envir=parent.frame(2))
@@ -28,5 +30,6 @@ stirling <- function(nn){
 
   assign("nn", nn, envir=parent.frame(2))
   ss <- eval(quote(allss[[nn]]), envir=parent.frame(2))
+  # gc()
   return(ss)
 }
