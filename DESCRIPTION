@@ -1,8 +1,8 @@
 Package: hdp
 Title: Hierarchical Dirichlet Process for categorical count data
-Version: 0.1.5
-Authors@R: c(person("Nicola", "Roberts",
-  email="nr3@sanger.ac.uk", role=c("aut", "cre")),
+Version: 0.1.5.0001
+Authors@R: c(person("Steve", "Rozen", email="steverozen@gmail.com", role="aut")
+  person("Nicola", "Roberts", email="nr3@sanger.ac.uk", role=c("aut", "cre")),
   person("Yee Whye", "Teh", role=c("aut", "cph"),
   comment="MATLAB and C original, http://www.stats.ox.ac.uk/~teh/research/npbayes/npbayes-r21.tgz"))
 Depends:
