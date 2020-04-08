@@ -58,6 +58,7 @@ Collate:
     'plot_chain.R'
     'plot_components.R'
     'stirling.R'
+    'stirling.closure.R'
     'utilities.R'
     'utilities_nr3.R'
     'zzz.R'
