@@ -1,7 +1,7 @@
 
 stir.closure <- make.stirling()
 
-SynSigRun::Runhdp(
+hdp.out <- SynSigRun::Runhdp(
   input.catalog =
     devtools::package_file(
       "data-raw/syn.2.7a.7b.abst.369/sp.sp/ground.truth.syn.catalog.csv"),
