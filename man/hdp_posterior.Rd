@@ -4,8 +4,15 @@
 \alias{hdp_posterior}
 \title{Posterior sampling chain across activated DPs.}
 \usage{
-hdp_posterior(hdp, burnin, n, space, cpiter = 1, seed = sample(1:10^7, 1),
-  verbosity = 0)
+hdp_posterior(
+  hdp,
+  burnin,
+  n,
+  space,
+  cpiter = 1,
+  seed = sample(1:10^7, 1),
+  verbosity = 0
+)
 }
 \arguments{
 \item{hdp}{A hdpState object}

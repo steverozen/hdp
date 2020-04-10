@@ -7,21 +7,50 @@
 \alias{plot_dp_comp_exposure}
 \title{Plot extracted components}
 \usage{
-plot_comp_size(hdpsample, legend = TRUE, col_a = "hotpink",
-  col_b = "skyblue3", xlab = "Component", ylab = "Number of data items",
-  ...)
+plot_comp_size(
+  hdpsample,
+  legend = TRUE,
+  col_a = "hotpink",
+  col_b = "skyblue3",
+  xlab = "Component",
+  ylab = "Number of data items",
+  ...
+)
 
-plot_comp_distn(hdpsample, comp = NULL, cat_names = NULL, grouping = NULL,
-  col = "grey70", col_nonsig = NULL, show_group_labels = FALSE,
-  cred_int = TRUE, weights = NULL, plot_title = NULL,
-  group_label_height = 1.05, cex.cat = 0.7, ...)
+plot_comp_distn(
+  hdpsample,
+  comp = NULL,
+  cat_names = NULL,
+  grouping = NULL,
+  col = "grey70",
+  col_nonsig = NULL,
+  show_group_labels = FALSE,
+  cred_int = TRUE,
+  weights = NULL,
+  plot_title = NULL,
+  group_label_height = 1.05,
+  cex.cat = 0.7,
+  ...
+)
 
-plot_dp_comp_exposure(hdpsample, dpindices, col_comp, dpnames = NULL,
-  main_text = NULL, incl_numdata_plot = TRUE, incl_nonsig = TRUE,
-  incl_comp0 = TRUE, ylab_numdata = "Number of data items",
-  ylab_exp = "Component exposure", leg.title = "Component",
-  cex.names = 0.6, cex.axis = 0.7, mar = c(1, 4, 2, 0.5), oma = c(1.5,
-  1.5, 1, 1), ...)
+plot_dp_comp_exposure(
+  hdpsample,
+  dpindices,
+  col_comp,
+  dpnames = NULL,
+  main_text = NULL,
+  incl_numdata_plot = TRUE,
+  incl_nonsig = TRUE,
+  incl_comp0 = TRUE,
+  ylab_numdata = "Number of data items",
+  ylab_exp = "Component exposure",
+  leg.title = "Component",
+  cex.names = 0.6,
+  cex.axis = 0.7,
+  mar = c(1, 4, 2, 0.5),
+  oma = c(1.5, 1.5, 1, 1),
+  ...
+)
 }
 \arguments{
 \item{hdpsample}{A hdpSampleChain or hdpSampleMulti object including output

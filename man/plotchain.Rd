@@ -7,16 +7,35 @@
 \alias{plot_data_assigned}
 \title{Diagnostic plots for HDP posterior sampling chain}
 \usage{
-plot_lik(chain, start = 1, end = length(lik(chain)), col_lik = "blue",
-  col_burn = "red", xlab = "Iteration", ylab = "Likelihood", ...)
+plot_lik(
+  chain,
+  start = 1,
+  end = length(lik(chain)),
+  col_lik = "blue",
+  col_burn = "red",
+  xlab = "Iteration",
+  ylab = "Likelihood",
+  ...
+)
 
-plot_numcluster(chain, col = "blue", xlab = "Sample",
-  ylab = "Number of raw clusters", ...)
+plot_numcluster(
+  chain,
+  col = "blue",
+  xlab = "Sample",
+  ylab = "Number of raw clusters",
+  ...
+)
 
-plot_data_assigned(chain, legend = TRUE, col_early = "hotpink",
-  col_late = "skyblue3", dat_prop = 0.995,
+plot_data_assigned(
+  chain,
+  legend = TRUE,
+  col_early = "hotpink",
+  col_late = "skyblue3",
+  dat_prop = 0.995,
   xlab = "Number of raw clusters",
-  ylab = "Cumulative prop. of data assigned", ...)
+  ylab = "Cumulative prop. of data assigned",
+  ...
+)
 }
 \arguments{
 \item{chain}{A hdpSampleChain object}
