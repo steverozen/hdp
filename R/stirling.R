@@ -1,7 +1,7 @@
 # func to calculate the unsigned stirling numbers of the first kind.
 stirling <- function(nn){
 
-  if (nn > 1e5) {
+  if (nn > 4e5) {
     stop("Calling old stirling function on too large nn:", nn)
   }
   message("s, nn = ", nn)
