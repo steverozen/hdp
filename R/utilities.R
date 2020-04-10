@@ -47,6 +47,13 @@ qq_addclass <- function(hdp,newclass){
 randnumtable <- function(weights,maxtable){
 
   cat("rnt:", paste(maxtable, collapse = " "), "\n", sep = "")
+  if (exists("stir.closure")) {
+    cat("Using new function stir.closure\n")
+    sfn <- stir.closure
+  } else {
+    cat("Using old function stirling\n")
+    sfn <- hdp:::stirling
+  }
 
   numtable <- rep(0, length(maxtable))
   B <- unique(sort(maxtable))
@@ -58,7 +65,7 @@ randnumtable <- function(weights,maxtable){
     maxtable <- B[ii]
     if (maxtable > 0){
       mm <- 1:maxtable
-      stirnum <- stir.closure(maxtable)
+      stirnum <- sfn(maxtable)
       for (jj in which(J == ii)){
         clik <- mm * weights[jj]
         clik <- cumsum(stirnum * exp(clik - max(clik)))

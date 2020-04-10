@@ -1,7 +1,9 @@
 # func to calculate the unsigned stirling numbers of the first kind.
 stirling <- function(nn){
 
-  cat("s:", nn, "\n", sep = "")
+  if (nn > 1e5) {
+    stop("Calling old stirling function on too large nn:", nn)
+  }
 
   if (!exists("maxnn", where=parent.frame(2))){
     assign("maxnn", 1, envir=parent.frame(2))

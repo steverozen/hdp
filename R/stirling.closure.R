@@ -9,7 +9,6 @@ make.stirling <- function(){
   allss <- list(1)
 
   stir <- function(nn) {
-    cat("c", nn, "\n", sep = "")
 
     len.all <- length(allss)
 
