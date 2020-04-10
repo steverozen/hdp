@@ -4,6 +4,7 @@ stirling <- function(nn){
   if (nn > 1e5) {
     stop("Calling old stirling function on too large nn:", nn)
   }
+  message("s, nn = ", nn)
 
   if (!exists("maxnn", where=parent.frame(2))){
     assign("maxnn", 1, envir=parent.frame(2))
