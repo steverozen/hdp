@@ -3,8 +3,8 @@ stirling <- function(nn){
 
   if (nn > 3e5) {
     # Note: 4e5 is too large on the "monster" server.
-    # Trying 3e5.
-    stop("Calling old stirling function on too large nn:", nn)
+    # 350000 crashed on q() with memory allocation warning.
+    stop("Calling old stirling function with nn > 3e5:", nn)
   }
   message("s, nn = ", nn)
 
