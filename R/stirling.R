@@ -1,10 +1,9 @@
 # func to calculate the unsigned stirling numbers of the first kind.
 stirling <- function(nn){
 
-  if (nn > 3e5) {
-    # Note: 4e5 is too large on the "monster" server.
-    # 350000 crashed on q() with memory allocation warning.
-    stop("Calling old stirling function with nn > 3e5:", nn)
+  if (nn > 200000) {
+    # Note: 250000 sometimes too large on the "monster" server.
+    stop("Calling old stirling function with nn > 2e5:", nn)
   }
   message("s, nn = ", nn)
 
