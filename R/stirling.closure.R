@@ -1,14 +1,25 @@
-# Caluculate the unsigned Stirling numbers of the first kind up to nn
-#
-# The return value is the vector of Stirling numbers, each divided by
-# the maxium Stirling number in the series. In the comments below
-# we will just refer to these as vectors of Stirling numbers.
-#
-make.stirling <- function(){
+#' Return a function to calculate the unsigned Stirling numbers of the first kind
+#'
+#' @export
+#'
+#' @return A function to caluculate a vector of unsigned Stirling numbers,
+#' \eqn{s(n ,k), k = 1...n},
+#' each divided by the maxium Stirling number in the series.
+#' The returned function is a closure with state that includes
+#' a list of all the unsigned Stirling number series \eqn{<=} the argument, \eqn{n},
+#' i.e. \eqn{[s(1, 1)], [s(2, 1), s(2, 2)], ..., [s(n, 1), ..., s(n, n)]}.
+#' Memory usage could be substantial, but the stored state
+#' does not include the many trailing zeros in the vectors.
+#' For this to work within the \code{\link[hdp]{hdp}} package the
+#' function returned *must* be called \code{stir.closure}.
+
+make.stirling <- function() {
 
   allss <- list(1)
 
   stir <- function(nn) {
+
+    if (nn == 0) return(1)
 
     len.all <- length(allss)
 

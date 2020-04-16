@@ -1,9 +1,10 @@
 test_that("simple test of stirling numbers", {
   sfn <- make.stirling()
   expect_equal(sfn(5), c(0.48, 1.00, 0.70, 0.20, 0.02))
+  expect_equal(sfn(0), 1)
 })
 
-test_that("stirling numbers; have a zero", {
+test_that("stirling numbers; have trailin vector of zeros", {
   sfn <- make.stirling()
   foo <- sfn(200)
   expect_equal(min(which(foo == 0)), 186)
