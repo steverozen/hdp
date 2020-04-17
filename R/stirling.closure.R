@@ -23,17 +23,19 @@ make.stirling <- function() {
 
     len.all <- length(allss)
 
-    for (mm in (len.all + 1):nn) { # For each new Stirling number series, if any
+    if (nn > len.all) {
+      for (mm in (len.all + 1):nn) { # For each new Stirling number series, if any
 
-      ss <- allss[[mm - 1]]
+        ss <- allss[[mm - 1]]
 
-      newss <- c(ss * (mm - 1), 0) + c(0, ss)
-      newss <- newss / max(newss)
+        newss <- c(ss * (mm - 1), 0) + c(0, ss)
+        newss <- newss / max(newss)
 
-      last.non.0 <- max(which(newss > 0))
-      newss <- newss[1:last.non.0]
+        last.non.0 <- max(which(newss > 0))
+        newss <- newss[1:last.non.0]
 
-      allss[[mm]] <<- newss
+        allss[[mm]] <<- newss
+      }
     }
 
     retval <- allss[[nn]]
@@ -46,11 +48,3 @@ make.stirling <- function() {
 
 }
 
-tests <- function(deb = FALSE) {
-
-  bb <- make.stirling()
-  if (deb) debug(bb)
-  testthat::expect_equal(bb(3), stirling(3))
-  testthat::expect_equal(bb(222), stirling(222))
-
-}
