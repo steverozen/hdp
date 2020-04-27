@@ -46,12 +46,13 @@ qq_addclass <- function(hdp,newclass){
 # func to randomly assign a number of tables
 randnumtable <- function(weights,maxtable){
 
-  cat("rnt:", paste(maxtable, collapse = " "), "\n", sep = "")
+  # cat("rnt:", paste(maxtable, collapse = " "), "\n", sep = "")
   if (exists("stir.closure")) {
-    cat("Using new function stir.closure\n")
+    # cat("Using new function stir.closure\n")
     sfn <- stir.closure
   } else {
-    cat("Using old function stirling\n")
+    # Temporary, for running some old tests (2020 04 27)
+    message("Using old function stirling")
     sfn <- hdp:::stirling
   }
 
