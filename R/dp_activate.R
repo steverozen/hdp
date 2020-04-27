@@ -90,7 +90,7 @@ dp_activate <- function(hdp, dpindex, initcc, seed=sample(1:10^7, 1)){
 
   for (kk in length(dpindex):1){
 
-    cat("dp_activate, loop2, kk =", kk, "\n")
+    # cat("dp_activate, loop2, kk =", kk, "\n")
 
     jj <- dpindex[kk]
     pp <- hdp@ppindex[jj]
