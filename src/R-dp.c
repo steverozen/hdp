@@ -1,7 +1,8 @@
+
 /*
  * Structure representing each Dirichlet process.  In particular, the
- * concentration parameter, the parent distribution, the beta weights, 
- * the numbers of data items/tables, and the statistics of data items 
+ * concentration parameter, the parent distribution, the beta weights,
+ * the numbers of data items/tables, and the statistics of data items
  * directly associated with this DP.
  *
  * alpha        The concentration parameter itself.
@@ -15,8 +16,8 @@
  *              datass(:,ii) is the statistics for data item ii.
  * classnd      The number of data items in each component, including virtual
  *              data items.  There are numclass+1 entries, one for each
- *              component and an extra one for the empty class.  In matlab 
- *              this is a row vector, with cc'th entry being the number of 
+ *              component and an extra one for the empty class.  In matlab
+ *              this is a row vector, with cc'th entry being the number of
  *              data items in component cc.
  * classnt      Same as classnd, except for number of tables.
  * beta         The weight associated with each component in this DP.  There
@@ -79,7 +80,7 @@ void rWriteDPList(SEXP result, int nn, DP *dpnew, int *dpstate, int numclass) {
     if ( dpstate[ii] == ACTIVE ) {
       rWriteListElement(dpelt,"alpha",rWriteRealScalar(dp->alpha));
       rWriteListElement(dpelt,"beta",rWriteDoubleVector(dp->beta, numclass, 0.0));
-    } 
+    }
 
     if ( dpstate[ii] == ACTIVE || dpstate[ii] == FROZEN ) {
       //int cc;
@@ -88,6 +89,6 @@ void rWriteDPList(SEXP result, int nn, DP *dpnew, int *dpstate, int numclass) {
       rWriteListElement(dpelt,"datacc", rWriteIntVector(dp->datacc,dp->numdata,1));
     }
   UNPROTECT(1);
-  }  
+  }
   Free(dpnew);
 }

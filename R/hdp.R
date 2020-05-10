@@ -3,7 +3,7 @@
 NULL
 
 .onUnload <- function(libpath){
-  library.dynam.unload("hdp", libpath)
+  library.dynam.unload("hdpx", libpath)
 }
 
 #' Fake categorical count data
