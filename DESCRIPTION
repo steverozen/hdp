@@ -64,4 +64,4 @@ Collate:
     'utilities_nr3.R'
     'zzz.R'
 VignetteBuilder: knitr
-RoxygenNote: 7.0.2
+RoxygenNote: 7.1.0

@@ -4,7 +4,9 @@
 \name{example_known_priors}
 \alias{example_known_priors}
 \title{Example known priors}
-\format{A numeric matrix with 10 rows and 2 columns.}
+\format{
+A numeric matrix with 10 rows and 2 columns.
+}
 \usage{
 example_known_priors
 }

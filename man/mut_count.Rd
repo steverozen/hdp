@@ -4,8 +4,10 @@
 \name{mut_count}
 \alias{mut_count}
 \title{Cancer mutation count data}
-\format{A matrix of mutation counts with 300 rows (one per cancer sample)
- and 96 columns (one per mutation category)}
+\format{
+A matrix of mutation counts with 300 rows (one per cancer sample)
+ and 96 columns (one per mutation category)
+}
 \usage{
 mut_count
 }

@@ -4,7 +4,9 @@
 \name{luad_multi}
 \alias{luad_multi}
 \title{Pposterior sampling chains on lung data, conditioned on prior sigs}
-\format{A hdpSampleMulti object with 200 posterior samples, 50 from each chain}
+\format{
+A hdpSampleMulti object with 200 posterior samples, 50 from each chain
+}
 \usage{
 luad_multi
 }

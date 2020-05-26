@@ -4,7 +4,9 @@
 \name{mut_example_multi}
 \alias{mut_example_multi}
 \title{Posterior sampling chains with cancer mutation data}
-\format{A hdpSampleMulti object with 200 posterior samples, 50 from each chain}
+\format{
+A hdpSampleMulti object with 200 posterior samples, 50 from each chain
+}
 \usage{
 mut_example_multi
 }

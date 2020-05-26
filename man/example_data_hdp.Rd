@@ -4,7 +4,9 @@
 \name{example_data_hdp}
 \alias{example_data_hdp}
 \title{Fake categorical count data}
-\format{A numeric count matrix with 10 rows and 6 columns}
+\format{
+A numeric count matrix with 10 rows and 6 columns
+}
 \usage{
 example_data_hdp
 }

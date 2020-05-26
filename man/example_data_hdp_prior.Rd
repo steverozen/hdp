@@ -4,7 +4,9 @@
 \name{example_data_hdp_prior}
 \alias{example_data_hdp_prior}
 \title{Fake categorical count data with priors}
-\format{A numeric count matrix with 100 rows and 10 columns}
+\format{
+A numeric count matrix with 100 rows and 10 columns
+}
 \usage{
 example_data_hdp_prior
 }

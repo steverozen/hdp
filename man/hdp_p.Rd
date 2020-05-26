@@ -4,7 +4,9 @@
 \name{hdp_p}
 \alias{hdp_p}
 \title{HDP posterior samples on example data with priors}
-\format{hdpSampleMulti object}
+\format{
+hdpSampleMulti object
+}
 \usage{
 hdp_p
 }
