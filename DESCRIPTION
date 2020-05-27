@@ -62,6 +62,7 @@ Collate:
     'stirling.closure.R'
     'utilities.R'
     'utilities_nr3.R'
+    'xhdp_posterior.R'
     'zzz.R'
 VignetteBuilder: knitr
 RoxygenNote: 7.1.0
