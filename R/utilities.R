@@ -49,11 +49,9 @@ randnumtable <- function(weights,maxtable){
   # cat("rnt:", paste(maxtable, collapse = " "), "\n", sep = "")
   if (exists("stir.closure")) {
     # cat("Using new function stir.closure\n")
-    sfn <- stir.closure
+    sfn <- stir.closure  # TODO see if we can define this function when the package is loaded
   } else {
-    # Temporary, for running some old tests (2020 04 27)
-    message("Using old function stirling")
-    sfn <- hdp:::stirling
+    stop("Global function stir.closure does not exist")
   }
 
   numtable <- rep(0, length(maxtable))
