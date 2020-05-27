@@ -58,11 +58,11 @@ Collate:
     'iterate.R'
     'plot_chain.R'
     'plot_components.R'
-    'stirling.R'
-    'stirling.closure.R'
+    'TestScaffold.R'
     'utilities.R'
     'utilities_nr3.R'
     'xhdp_posterior.R'
+    'xmake.s.R'
     'zzz.R'
 VignetteBuilder: knitr
 RoxygenNote: 7.1.0
