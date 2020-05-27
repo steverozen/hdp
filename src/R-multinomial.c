@@ -14,7 +14,7 @@ double marglikelihoods(double *clik, HH hh, int numqq, QQ *qq, SS ss) {
   int ii;
   eta0 = hh.eta[0];
   etas = hh.eta[ss];
-  for ( ii = 0 ; ii < numqq ; ii++ ) 
+  for ( ii = 0 ; ii < numqq ; ii++ )
     clik[ii] = (etas + qq[ii][ss]) / (eta0 + qq[ii][0]);
   return 0;
 }
@@ -36,8 +36,8 @@ void deldata(HH hh, QQ qq, SS ss) {
 QQ newclass(HH hh) {
   int ii;
   QQ result;
-  result = malloc(sizeof(int)*(hh.numdim+1));
-  for ( ii = 0 ; ii <= hh.numdim ; ii++ ) 
+  result = hdp_malloc(sizeof(int)*(hh.numdim+1));
+  for ( ii = 0 ; ii <= hh.numdim ; ii++ )
     result[ii] = 0;
   return result;
 }
@@ -73,7 +73,7 @@ HH rReadHH(const SEXP vector) {
   result.eta    = malloc(sizeof(double)*(1+result.numdim));
   sum           = 0.0;
   pr            = REAL(vector);
-  for ( ii = 0 ; ii < result.numdim ; ii++ ) 
+  for ( ii = 0 ; ii < result.numdim ; ii++ )
     sum += result.eta[ii+1]  = pr[ii];
   result.eta[0] = sum;
   return result;
@@ -94,7 +94,7 @@ QQ *rReadQQVector(HH hh, const SEXP qqmatrix, int maxnum) {
   maxnum = max(maxnum,nn);
   result = malloc(sizeof(QQ)*maxnum);
 
-  pr = INTEGER(qqmatrix); 
+  pr = INTEGER(qqmatrix);
 
   for ( jj = 0 ; jj < nn ; jj++ ) {
     result[jj] = newclass(hh);
@@ -104,7 +104,7 @@ QQ *rReadQQVector(HH hh, const SEXP qqmatrix, int maxnum) {
     }
     result[jj][0] = sum;
   }
-  for ( jj = nn ; jj < maxnum ; jj++ ) 
+  for ( jj = nn ; jj < maxnum ; jj++ )
     result[jj] = newclass(hh);
   UNPROTECT(1);
   return result;
