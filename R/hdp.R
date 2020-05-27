@@ -45,8 +45,7 @@ NULL
 #' provided in \code{\link{example_known_priors}}.
 #'
 #' @format hdpSampleMulti object
-"hdp_p"
-
+# "hdp_p"  (package hdp "hard coded" in)
 
 #' Cancer mutation count data
 #'
@@ -58,7 +57,7 @@ NULL
 #'
 #' @format A matrix of mutation counts with 300 rows (one per cancer sample)
 #'  and 96 columns (one per mutation category)
-"mut_count"
+# "mut_count"  (package hdp "hard coded" in)
 
 
 #' Posterior sampling chains with cancer mutation data
@@ -75,7 +74,7 @@ NULL
 #' before collecting 50 posterior samples with 200 iterations between each.
 #'
 #' @format A hdpSampleMulti object with 200 posterior samples, 50 from each chain
-"mut_example_multi"
+# "mut_example_multi" (package hdp "hard coded" in)
 
 
 #' Pposterior sampling chains on lung data, conditioned on prior sigs
@@ -85,4 +84,4 @@ NULL
 #' 30 known prior signatures from https://cancer.sanger.ac.uk/cosmic/signatures (COSMIC v84).
 #'
 #' @format A hdpSampleMulti object with 200 posterior samples, 50 from each chain
-"luad_multi"
+# "luad_multi" (package hdp "hard coded" in)
