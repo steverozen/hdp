@@ -1,17 +1,11 @@
 
 test_that("TestScaffold1", {
 
-
-  # input.catalog <- ICAMS::ReadCatalog("cat.csv")
   load("input.catalog.Rdata")
   # Get variable input.catalog
 
-  # input.catalog <-
-  #  ICAMS::ReadCatalog("SBS96.ground.truth/ground.truth.syn.catalog.csv")
-
   reg <- new.env()
-  load("RunhdpInternal.testdata/test.RunhdpInternal.2.Rdata",
-       envir = reg)
+  load("TestScaffold1.Rdata", envir = reg)
 
   retvalx <- TestScaffold1(
     input.catalog = input.catalog[1:10 , 1:15],
@@ -24,8 +18,7 @@ test_that("TestScaffold1", {
     num.posterior = 1
   )
 
-  # save(retvalx, file = "RunhdpInternal.testdata/test.RunhdpInternal.2.Rdata")
+  # save(retvalx, file = "TestScaffold1.Rdata")
 
-  expect_equal(retvalx$signature, reg$retvalx$signature)
-  expect_equal(retvalx$exposure, reg$retvalx$exposure)
+  expect_equal(retvalx, reg$retvalx)
 })

@@ -36,7 +36,7 @@ void deldata(HH hh, QQ qq, SS ss) {
 QQ newclass(HH hh) {
   int ii;
   QQ result;
-  result = hdp_malloc(sizeof(int)*(hh.numdim+1));
+  result = malloc_and_check(sizeof(int)*(hh.numdim+1));
   for ( ii = 0 ; ii <= hh.numdim ; ii++ )
     result[ii] = 0;
   return result;
@@ -47,7 +47,7 @@ SS *rReadSSVector(const SEXP ssdata) {
   int *pr;
   int ii;
   pr = INTEGER(ssdata);
-  result = malloc(sizeof(SS)*length(ssdata));
+  result = malloc_and_check(sizeof(SS)*length(ssdata));
   for ( ii = 0 ; ii < length(ssdata) ; ii++ )
     result[ii] = pr[ii];
   return result;
@@ -70,7 +70,7 @@ HH rReadHH(const SEXP vector) {
   int ii;
   HH result;
   result.numdim = length(vector);
-  result.eta    = malloc(sizeof(double)*(1+result.numdim));
+  result.eta    = malloc_and_check(sizeof(double)*(1+result.numdim));
   sum           = 0.0;
   pr            = REAL(vector);
   for ( ii = 0 ; ii < result.numdim ; ii++ )
@@ -92,7 +92,7 @@ QQ *rReadQQVector(HH hh, const SEXP qqmatrix, int maxnum) {
   nn = INTEGER(dims)[1];
   if ( mm != hh.numdim ) error("Number of dimensions don't match.");
   maxnum = max(maxnum,nn);
-  result = malloc(sizeof(QQ)*maxnum);
+  result = malloc_and_check(sizeof(QQ)*maxnum);
 
   pr = INTEGER(qqmatrix);
 

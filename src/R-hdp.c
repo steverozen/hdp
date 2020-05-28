@@ -69,7 +69,7 @@
 /***************************************************************************/
 HDP *rReadHDP(SEXP hdpin) {
   HDP *result;
-  result = malloc(sizeof(HDP));
+  result = malloc_and_check(sizeof(HDP));
   rdebug0(1,"Reading HDP.\n");
   result->numdp       = asInteger(rReadListElement(hdpin,"numdp"));
   result->numconparam = asInteger(rReadListElement(hdpin,"numconparam"));
@@ -81,7 +81,7 @@ HDP *rReadHDP(SEXP hdpin) {
   result->dp          = rReadDPList(rReadListElement(hdpin,"dp"),
                             result->dpstate,result->base->maxclass);
   result->conparam    = rReadConparamVector(rReadListElement(hdpin,"conparam"));
-  result->clik        = malloc(sizeof(double)*result->base->maxclass);
+  result->clik        = malloc_and_check(sizeof(double)*result->base->maxclass);
   return result;
 }
 
@@ -537,8 +537,8 @@ void hdp_dpactivate(HDP *hdp, int jj) {
 
   rdebug1(1,"Activating DP %d.\n",jj);
   if ( dpstate[jj] == HELDOUT ) {
-    dp->classnd = classnd = malloc(sizeof(int)*maxclass);
-    dp->classnt = classnt = malloc(sizeof(int)*maxclass);
+    dp->classnd = classnd = malloc_and_check(sizeof(int)*maxclass);
+    dp->classnt = classnt = malloc_and_check(sizeof(int)*maxclass);
     for ( cc = 0 ; cc < maxclass ; cc++ ) {
       classnd[cc] = 0;
     }
@@ -548,7 +548,7 @@ void hdp_dpactivate(HDP *hdp, int jj) {
     hh       = base->hh;
     classqq  = base->classqq;
     datass   = dp->datass;
-    dp->datacc = datacc = malloc(sizeof(int)*numdata);
+    dp->datacc = datacc = malloc_and_check(sizeof(int)*numdata);
     for ( ii = 0 ; ii < numdata ; ii++ ) {
       datacc[ii] = cc = randuniform(numclass);
       rdebug1(1,"cc %d\n",cc);
@@ -570,7 +570,7 @@ void hdp_dpactivate(HDP *hdp, int jj) {
   conparam  = hdp->conparam;
   cp        = hdp->cpindex[jj];
   dp->alpha = conparam[cp].alpha;
-  dp->beta  = beta = malloc(sizeof(double)*maxclass);
+  dp->beta  = beta = malloc_and_check(sizeof(double)*maxclass);
   for ( cc = 0 ; cc < maxclass ; cc++ )
     beta[cc] = 0.0;
   hdp_randbeta(hdp,jj);

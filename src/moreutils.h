@@ -3,6 +3,8 @@
 
 #include <stdlib.h>
 
-void* hdp_malloc(size_t x);
+void* malloc_and_check(size_t x);
+
+void* mallocR(size_t x);
 
 #endif
