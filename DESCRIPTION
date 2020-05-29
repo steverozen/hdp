@@ -7,7 +7,7 @@ Authors@R: c(person("Steve", "Rozen", email="steverozen@gmail.com", role="aut"),
   comment="MATLAB and C original, http://www.stats.ox.ac.uk/~teh/research/npbayes/npbayes-r21.tgz"))
 Encoding: UTF-8
 Depends:
-    R(>= 3.2)
+    R(>= 3.5.0)
 Imports:
     lsa,
     methods,
