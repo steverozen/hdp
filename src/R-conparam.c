@@ -14,13 +14,13 @@
  * totalnt      Same as totalnd for number of tables in each DP.
  *
  * CONPARAM *mxReadConparamVector(mxArray *mcell);
- *              reads in a CONPARAM struct from a matlab struct. 
+ *              reads in a CONPARAM struct from a matlab struct.
  * void mxWriteConparamVector(mxArray *result,CONPARAM *cparray);
- *              writes a CONPARAM struct to a matlab struct.  Overwrites 
+ *              writes a CONPARAM struct to a matlab struct.  Overwrites
  *              fields if necessary.  Frees memory allocated.
  */
 
-
+#include "moreutils.h"
 #include "R-conparam.h"
 
 CONPARAM *rReadConparamVector(SEXP cpin) {
@@ -28,7 +28,7 @@ CONPARAM *rReadConparamVector(SEXP cpin) {
   CONPARAM *result, *cp;
   int ii, nn;
   nn = length(cpin);
-  result = malloc(sizeof(CONPARAM)*nn);
+  result = malloc_and_check(sizeof(CONPARAM)*nn);
   for ( ii = 0 ; ii < nn ; ii++ ) {
     cplistelt = PROTECT(VECTOR_ELT(cpin,ii));
     cp  = result + ii;

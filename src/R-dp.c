@@ -41,7 +41,7 @@ DP *rReadDPList(SEXP dpin, int *dpstate, int mm) {
   DP *result, *dp;
   int ii, nn;
   nn = length(dpin);
-  result = malloc(sizeof(DP)*nn);
+  result = malloc_and_check(sizeof(DP)*nn);
   for ( ii = 0 ; ii < nn ; ii++ ) {
     dpelt       = PROTECT(VECTOR_ELT(dpin,ii));
     dp            = result+ii;

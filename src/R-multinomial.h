@@ -6,6 +6,7 @@
 #include <math.h>
 #include <stdlib.h>
 #include "R-utils.h"
+#include "moreutils.h"
 
 
 typedef struct {
