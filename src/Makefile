@@ -6,7 +6,7 @@ hdpx.so : $(objects)
 
 
 $(objects): %.o: %.c
-	gcc -std=gnu99 -I"/opt/R/R-4.0.0/lib64/R/include" -DNDEBUG   -I/usr/local/include   -fpic  -g -O0  -c $< -o $@
+	gcc -std=gnu99 -I"/opt/R/R-4.0.0/lib64/R/include" -DNDEBUG   -I/usr/local/include   -fpic  -g -O1  -c $< -o $@
 
 clean:
 	rm -f hdpx.so *.o
