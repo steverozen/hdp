@@ -2,22 +2,25 @@
 #'
 #' @export
 #'
-#' @return A function to caluculate a vector of unsigned Stirling numbers,
+#' @return A function to calculate a vector of unsigned Stirling numbers,
 #' \eqn{s(n ,k), k = 1...n},
-#' each divided by the maxium Stirling number in the series.
+#' each divided by the maximum Stirling number in the series.
 #' The returned function is a closure with state that includes
 #' a list of all the unsigned Stirling number series \eqn{<=} the argument, \eqn{n},
+#'
 #' i.e. \eqn{[s(1, 1)], [s(2, 1), s(2, 2)], ..., [s(n, 1), ..., s(n, n)]}.
 #' Memory usage could be substantial, but the stored state
 #' does not include the many trailing zeros in the vectors.
-#' For this to work within the \code{\link[hdp]{hdp}} package the
+#' For this to work within the hdp (https://github.com/nicolaroberts/hdp)
+#' package the
 #' function returned *must* be called \code{stir.closure}.
 
-make.stirling <- function() {
+xmake.s <- function() {
 
   allss <- list(1)
 
   stir <- function(nn) {
+    # cat(".\n")
 
     if (nn == 0) return(1)
 
@@ -41,6 +44,7 @@ make.stirling <- function() {
     retval <- allss[[nn]]
     retval <- c(retval, rep(0, nn - length(retval)))
     stopifnot(length(retval) == nn)
+    attr(retval, "closure") <- TRUE
     return(retval)
   }
 

@@ -6,6 +6,6 @@
 #' @useDynLib hdpx hdpMultinomial_iterate
 iterate <- function(hdplist, numiter, cpiter, verbosity){
   out <- .Call(hdpMultinomial_iterate, hdplist, numiter, cpiter,
-               dolik=1, verbosity, PACKAGE="hdp")
+               dolik=1, verbosity, PACKAGE="hdpx")
   return(out)
 }
