@@ -28,9 +28,9 @@ SEXP hdpMultinomial_iterate(SEXP hdpin, SEXP numiter, SEXP doconparam, SEXP doli
   SET_VECTOR_ELT(result, 0, hdpout);
   SET_VECTOR_ELT(result, 1, LIK);
 
-  UNPROTECT(3);
-
   PutRNGstate();
+
+  UNPROTECT(3);
 
   return result;
 }
