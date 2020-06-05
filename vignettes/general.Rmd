@@ -25,7 +25,7 @@ Statistical Association, 2006, 101:476). This R package was adapted from
 written by Yee Whye Teh. 
 
 ```{r load}
-library(hdp)
+library(hdpx)
 ```
 
 # Terminology and method overview

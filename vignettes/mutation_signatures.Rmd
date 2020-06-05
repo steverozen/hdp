@@ -45,7 +45,7 @@ substitution mutations in each of the 96 categories defined by local trinucleoti
 are tallied across 100 lung cancers, 100 ovarian cancers, and 100 melanomas.  
 
 ```{r loaddata}
-library(hdp)
+library(hdpx)
 # library(GenomicRanges)
 # 
 # # Lung adenocarcinoma

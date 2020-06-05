@@ -1,5 +1,5 @@
 .onAttach <- function(libname, pkgname) {
-  uu <- sessionInfo()$otherPkgs
+  uu <- utils::sessionInfo()$otherPkgs
   extra <- ifelse(is.null(uu), "", uu$hdpx$Version)
   packageStartupMessage("This is ", libname, " and ", pkgname,
                         " v", extra)
