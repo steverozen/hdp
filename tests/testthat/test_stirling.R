@@ -16,17 +16,17 @@ test_that("stirling numbers; have trailin vector of zeros", {
 })
 
 test_that("randnumtable", {
-  if (exists("stir.closure", envir = .GlobalEnv)) {
-  rm("stir.closure", envir = .GlobalEnv)
-  }
+  # if (exists("stir.closure", envir = .GlobalEnv)) {
+  # rm("stir.closure", envir = .GlobalEnv)
+  # }
   # set.seed(1066)
   # foo <- randnumtable(rep(1, 6) / 6,
   #                     c(7068, 6864, 7207, 7050, 7039, 0))
-  assign("stir.closure", xmake.s(), .GlobalEnv)
+  # assign("stir.closure.tests", xmake.s(), .GlobalEnv)
   set.seed(1066)
   bar <- randnumtable(rep(1, 6) / 6,
                       c(7068, 6864, 7207, 7050, 7039, 0))
-  rm("stir.closure", envir = .GlobalEnv)
+  # rm("stir.closure", envir = .GlobalEnv)
   # expect_equal(foo, c(2, 2, 1, 3, 3, 0))
   expect_equal(bar, c(2, 2, 1, 3, 3, 0))
 })

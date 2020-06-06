@@ -1,4 +1,4 @@
 library(testthat)
-library(hdp)
+library(hdpx)
 
-test_check("hdp")
+test_check("hdpx")

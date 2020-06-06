@@ -23,6 +23,9 @@ TestScaffold1(
 )
 }
 \arguments{
+\item{input.catalog}{Input spectra catalog as a matrix or
+in \code{\link[ICAMS]{ICAMS}} format.}
+
 \item{CPU.cores}{Number of CPUs to use in running
 \code{\link[hdpx]{hdp_posterior}}; this is used to parallelize
 running the posterior sampling chains, so there is no
@@ -85,6 +88,5 @@ as a .Rdata file.}
 The list of sample changes returned by \code{hdp_posterior}.
 }
 \description{
-@param input.catalog Input spectra catalog as a matrix or
-in \code{\link[ICAMS]{ICAMS}} format.
+Debugging scaffold for c code in hdpx/hdp
 }

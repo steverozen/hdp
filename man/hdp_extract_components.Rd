@@ -21,9 +21,6 @@ If prior components included via \code{\link{hdp_prior_init}} are
 preserved by \code{hdp_extract_components}, they are prefixed with "P".
 Any new components in this case are prefixed with "N".
 }
-\examples{
-hdp_extract_components(mut_example_multi)
-}
 \seealso{
 \code{\link{hdp_posterior}}, \code{\link{hdp_multi_chain}},
  \code{\link{plot_comp_size}}, \code{\link{plot_comp_distn}},

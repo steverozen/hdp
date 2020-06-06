@@ -1,6 +1,6 @@
 #' Debugging scaffold for c code in hdpx/hdp
 #'
-#'  @param input.catalog Input spectra catalog as a matrix or
+#' @param input.catalog Input spectra catalog as a matrix or
 #' in \code{\link[ICAMS]{ICAMS}} format.
 #'
 #' @param CPU.cores Number of CPUs to use in running
@@ -83,9 +83,9 @@ TestScaffold1 <-
            checkpoint.aft.post = NULL
 ) { # 15 arguments
 
-    if (!exists("stir.closure", envir = .GlobalEnv)) {
-      assign("stir.closure", xmake.s(), envir = .GlobalEnv)
-    }
+    # if (!exists("stir.closure", envir = .GlobalEnv)) {
+    #  assign("stir.closure", xmake.s(), envir = .GlobalEnv)
+    # }
 
     # hdp gets confused if the class of its input is not matrix.
     convSpectra <- t(input.catalog)

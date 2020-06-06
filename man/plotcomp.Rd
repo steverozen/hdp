@@ -128,21 +128,3 @@ be included (per DP)? (Default TRUE)}
 \description{
 Plot extracted components
 }
-\examples{
-mut_example_multi <- hdp_extract_components(mut_example_multi)
-plot_comp_size(mut_example_multi, bty="L")
-bases <- c("A", "C", "G", "T")
-trinuc_context <- paste0(rep(rep(bases, times=6), each=4),
-                         rep(c("C", "T"), each=48),
-                         rep(bases, times=24))
-group_factor <- as.factor(rep(c("C>A", "C>G", "C>T", "T>A", "T>C", "T>G"),
-                           each=16))
-plot_comp_distn(mut_example_multi, cat_names=trinuc_context,
-                grouping=group_factor, col=RColorBrewer::brewer.pal(6, "Set2"),
-                col_nonsig="grey80", show_group_labels=TRUE)
-plot_dp_comp_exposure(mut_example_multi, 5:30,
-                      RColorBrewer::brewer.pal(12, "Set3"))
-plot_dp_comp_exposure(mut_example_multi, 5:30,
-                      RColorBrewer::brewer.pal(12, "Set3"),
-                      incl_numdata_plot=FALSE, incl_nonsig=FALSE)
-}
