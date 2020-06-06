@@ -47,14 +47,14 @@ qq_addclass <- function(hdp,newclass){
 randnumtable <- function(weights,maxtable){
 
   # cat("rnt:", paste(maxtable, collapse = " "), "\n", sep = "")
-  if (exists("stir.closure")) {
+  # if (exists("stir.closure")) {
     # cat("Using new function stir.closure\n")
     sfn <- stir.closure
-  } else {
+  # } else {
     # Temporary, for running some old tests (2020 04 27)
-    message("Using old function stirling")
-    sfn <- hdp:::stirling
-  }
+    # message("Using old function stirling")
+    # sfn <- hdp:::stirling
+  # }
 
   numtable <- rep(0, length(maxtable))
   B <- unique(sort(maxtable))
