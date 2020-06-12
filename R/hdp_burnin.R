@@ -1,4 +1,4 @@
-#' Burning of posterior sampling chain across activated DPs.
+#' Burnin of posterior sampling chain across activated DPs.
 #'
 #' Run a Gibbs sampler over the activated nodes of a hierarchical Dirichlet process.
 #' Each iteration re-assigns the cluster allocation of every data item.
