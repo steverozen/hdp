@@ -3,7 +3,8 @@
 #' Run a Gibbs sampler over the activated nodes of a hierarchical Dirichlet process.
 #' Each iteration re-assigns the cluster allocation of every data item.
 #'
-#' @param hdp An \code{\link[hdpx]{hdpState-class}} object.
+#' @param hdp An \code{\link[hdpx]{hdpState-class}} object or a list representation
+#'   of this.
 #'
 #' @param burnin The number of burn-in iterations.
 #'
@@ -38,8 +39,13 @@ hdp_burnin <- function(hdp,
                        verbosity=0){
 
   # input checks
-  if (class(hdp) != "hdpState") stop("hdp must have class hdpState")
-  if (!validObject(hdp)) stop("input hdp is not a valid hdpState object")
+  if (class(hdp) == "hdpState") {
+    if (!validObject(hdp)) stop("input hdp is not a valid hdpState object")
+    # translate hdp hdpState (S4 class) to plain list so C code can parse
+    hdplist <- as.list(hdp)
+  }  else {
+    hdplist <- hdp
+  }
   for (arg in c("burnin", "cpiter")) {
     x <- get(arg)
     if (x < 1 | x %% 1 != 0) stop(paste(arg, "must be a positive integer"))
@@ -47,9 +53,6 @@ hdp_burnin <- function(hdp,
   if (verbosity < 0 |
         verbosity > 4 |
         verbosity %% 1 != 0) stop("verbosity must be integer from 0--4")
-
-  # translate hdp hdpState (S4 class) to plain list so C code can parse
-  hdplist <- as.list(hdp)
 
   burnin.time <- system.time(
     # Call the C code to do the Gibbs sampling iterations
@@ -60,7 +63,7 @@ hdp_burnin <- function(hdp,
     message(" ", xn, " ", burnin.time[[xn]])
   }
 
-  return(invisible(list(hdplist     = output[[1]],
+  return(invisible(list(hdplist   = output[[1]],
                        likelihood = output[[2]])))
 
 }

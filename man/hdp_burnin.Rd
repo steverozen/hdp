@@ -7,7 +7,8 @@
 hdp_burnin(hdp, burnin, cpiter = 1, verbosity = 0)
 }
 \arguments{
-\item{hdp}{An \code{\link[hdpx]{hdpState-class}} object.}
+\item{hdp}{An \code{\link[hdpx]{hdpState-class}} object or a list representation
+of this.}
 
 \item{burnin}{The number of burn-in iterations.}
 
