@@ -2,7 +2,7 @@
 % Please edit documentation in R/hdp_burnin.R
 \name{hdp_burnin}
 \alias{hdp_burnin}
-\title{Burning of posterior sampling chain across activated DPs.}
+\title{Burnin of posterior sampling chain across activated DPs.}
 \usage{
 hdp_burnin(hdp, burnin, cpiter = 1, verbosity = 0)
 }
@@ -21,9 +21,10 @@ to perform after each iteration.}
 \value{
 A list with the elements: \describe{
 
-\item{hdplist}{A list represetnation of an \code{\link[hdpx]{hdpState-class}}.}
+\item{hdplist}{A list representation of
+   an \code{\link[hdpx]{hdpState-class}} object.}
 
-\item{liklihood}{A numeric vector with the likelihood at each iteration.}
+\item{likelihood}{A numeric vector with the likelihood at each iteration.}
 
 }
 }

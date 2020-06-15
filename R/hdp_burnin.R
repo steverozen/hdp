@@ -16,9 +16,10 @@
 #'
 #' @return A list with the elements: \describe{
 #'
-#' \item{hdplist}{A list represetnation of an \code{\link[hdpx]{hdpState-class}}.}
+#' \item{hdplist}{A list representation of
+#'    an \code{\link[hdpx]{hdpState-class}} object.}
 #'
-#' \item{liklihood}{A numeric vector with the likelihood at each iteration.}
+#' \item{likelihood}{A numeric vector with the likelihood at each iteration.}
 #'
 #' }
 #'
