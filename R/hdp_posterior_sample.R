@@ -9,13 +9,13 @@
 #' independent HDP sampling chains in a hdpSampleMulti object via \code{\link{hdp_multi_chain}}.
 #' Components are extracted via \code{\link{hdp_extract_components}}.
 #'
-#' @param burnin.output An S4 object from \code{\link{hdp_burnin}}.
-#' @param n The number of posterior samples to collect.
-#' @param space The number of iterations between collected samples.
-#' @param cpiter The number of iterations of concentration parameter sampling to perform after each iteration.
+#' @param sampling_input An S4 object from \code{\link{hdp_burnin}}.
+#' @param post.n The number of posterior samples to collect.
+#' @param post.space The number of iterations between collected samples.
+#' @param post.cpiter The number of iterations of concentration parameter sampling to perform after each iteration.
 #' @param seed The (integer) seed that can be set to reproduce output. Default is a
 #'  random seed from 1 -- 10^7, reported in the output.
-#' @param verbosity Verbosity of debugging statements.
+#' @param post.verbosity Verbosity of debugging statements.
 #'  0 (least verbose) -- 4 (most verbose). 0 highly recommended - only change for debugging small examples.
 #' @return A hdpSampleChain object with the salient information from each
 #'  posterior sample. See \code{\link{hdpSampleChain-class}}
@@ -25,42 +25,63 @@
 #' @importClassesFrom Matrix dgCMatrix
 #' @export
 
-hdp_posterior_sample <- function(burnin.output,
-                                 n,
-                                 space,
-                                 cpiter=1,
+hdp_posterior_sample <- function(posterior_input,
+                                 post.n,
+                                 post.space,
+                                 post.cpiter=1,
                                  seed=sample(1:10^7, 1),
-                                 verbosity=0){
+                                 post.verbosity=0){
 
-  set.seed(seed) ##set.seed in the function because of parallelization
+  set.seed(seed) ##set.seed in the function when running parallel
+
+  ## check the class of input from hdp_burnin or hdp_posterior_sample
+
+  if(class(posterior_input)[1] == "hdpSampleChain"){ #extend Gibbs sampling
+
+    message("Extend Gibbs Sampling")
+
+    posterior_input <-  hdpx:::as.list(posterior_input)
+
+    #pick up from the end of last gibbs sampling
+    sampling_input <- list(hdplist = hdpx:::as.list(posterior_input$hdp),
+                          likelihood = posterior_input$lik)
+
+  }else if(class(posterior_input) == "list"){
+      sampling_input <- posterior_input
+      message("Gibbs Sampling after Burn-in Iteration")
+
+    }else{
+    message("Input is not a hdpSampleChain or a list from hdp_burnin")
+    stop()
+  }
 
   # input checks
-  ## check burnin.output
+  ## check sampling_input
 
-  hdplist <- burnin.output$hdplist
+  hdplist <- sampling_input$hdplist
 
-  if (cpiter < 1 | cpiter %% 1 != 0) stop("cpiter must be a positive integer")
+  if (post.cpiter < 1 | post.cpiter %% 1 != 0) stop("post.cpiter must be a positive integer")
 
-  if (verbosity < 0 |
-      verbosity > 4 |
-      verbosity %% 1 != 0) stop("verbosity must be integer from 0--4")
+  if (post.verbosity < 0 |
+      post.verbosity > 4 |
+      post.verbosity %% 1 != 0) stop("post.verbosity must be integer from 0--4")
 
   # initialise list for posterior sample output
   starttime <- Sys.time()
   curriter <- 0 #keep track of time
   sample  <- list()
 
-  if(!exists("all.lik",where=burnin.output)){
-    burnin.output$all.lik <- burnin.output$likelihood
-  } ##maybe all.lik is not available for every burnin? not sure. but safe to check
+  if(!exists("all.lik",where = sampling_input)){
+    sampling_input$all.lik <- sampling_input$likelihood
+  } ##all.lik is not available every time
 
-  all.lik <- burnin.output$all.lik
-  burnin <- length(burnin.output$all.lik) #pass burnin to the final state
-  totiter <- n*space
-  # collect n posterior samples
-  for (samp in 1:n){
+  all.lik <- sampling_input$all.lik
+  burnin <- length(sampling_input$all.lik) #pass burnin to the final state
+  totiter <- post.n * post.space
+  # collect post.n posterior samples
+  for (samp in 1:post.n){
 
-    output <- iterate(hdplist, space, cpiter, verbosity)
+    output <- iterate(hdplist, post.space, post.cpiter, post.verbosity)
     hdplist <- output[[1]]
     all.lik <- c(all.lik,output[[2]])
 
@@ -70,7 +91,7 @@ hdp_posterior_sample <- function(burnin.output,
 
     #report time every 10 samples if > 1 min has passed
     tracktime <- Sys.time()
-    curriter <- curriter + space
+    curriter <- curriter + post.space
 
     if (samp %% 10 == 0){
       elapsedtime <- (tracktime - starttime)/60
@@ -79,7 +100,7 @@ hdp_posterior_sample <- function(burnin.output,
     }
   }
 
-
+  ## these four can be wrapped up?
   numclass <- sapply(sample, function(x) x$numclass)
   classqq <- lapply(sample, function(x) x$classqq)
   classnd <- lapply(sample, function(x) as(x$classnd, "dgCMatrix"))
@@ -87,7 +108,7 @@ hdp_posterior_sample <- function(burnin.output,
 
   # if only one conparam, then alpha can have wrong dims (vector not matrix)
   # Need to check. I don't think there is any condition has only one conparam. added by Mo
-  if (dim(alpha)[1]==1 & n > 1) {
+  if (dim(alpha)[1]==1 & post.n > 1) {
     alpha <- matrix(alpha, ncol=1)
   }
 
@@ -97,10 +118,12 @@ hdp_posterior_sample <- function(burnin.output,
 
   ans <- new("hdpSampleChain",
              seed = as.integer(seed),
-             settings = list(burnin=burnin,
-                             n=n,
-                             space=space,
-                             cpiter=cpiter),
+
+             ##changing names here cause a check error in hdpx::new
+             settings = list(burnin       = burnin,
+                             n            = post.n,
+                             space        = post.space,
+                             cpiter       = post.cpiter),
              hdp = hdp,
              lik = all.lik,
              numcluster = numclass,

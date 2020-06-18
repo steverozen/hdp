@@ -7,16 +7,30 @@ test_that("hdp_posterior_sample", {
   reg2 <- new.env()
   load("hdp.posterior.sample.expected.Rdata", envir = reg2)
 
+  reg3 <- new.env()
+  load("extend.hdp.posterior.sample.expected.Rdata", envir = reg3)
+
   set.seed(44)
 
-  retvalx <- hdp_posterior_sample(burnin.output = reg$retvalx,
-                                  n = 15,
-                                  space = 10,
-                                  cpiter = 3,
-                                  seed=44,
-                                  verbosity=0)
+
+  retvalx <- hdp_posterior_sample(posterior_input = reg$retvalx,
+                                       post.n          = 15,
+                                       post.space      = 10,
+                                       post.cpiter     = 3,
+                                       seed            = 44,
+                                       post.verbosity  = 0)
+
+  retvalx.extend <- hdp_posterior_sample(posterior_input = retvalx,
+                                         post.n          = 15,
+                                         post.space      = 10,
+                                         post.cpiter     = 3,
+                                         seed            = 44,
+                                         post.verbosity  = 0)
 
   # save(retvalx, file = "hdp.posterior.sample.expected.Rdata")
+  # save(retvalx.extend, file = "extend.hdp.posterior.sample.expected.Rdata")
 
   expect_equal(retvalx, reg2$retvalx)
+  expect_equal(retvalx.extend, reg3$retvalx.extend)
+
 })

@@ -5,28 +5,28 @@
 \title{Posterior sampling chain across activated DPs.}
 \usage{
 hdp_posterior_sample(
-  burnin.output,
-  n,
-  space,
-  cpiter = 1,
+  posterior_input,
+  post.n,
+  post.space,
+  post.cpiter = 1,
   seed = sample(1:10^7, 1),
-  verbosity = 0
+  post.verbosity = 0
 )
 }
 \arguments{
-\item{burnin.output}{An S4 object from \code{\link{hdp_burnin}}.}
+\item{post.n}{The number of posterior samples to collect.}
 
-\item{n}{The number of posterior samples to collect.}
+\item{post.space}{The number of iterations between collected samples.}
 
-\item{space}{The number of iterations between collected samples.}
-
-\item{cpiter}{The number of iterations of concentration parameter sampling to perform after each iteration.}
+\item{post.cpiter}{The number of iterations of concentration parameter sampling to perform after each iteration.}
 
 \item{seed}{The (integer) seed that can be set to reproduce output. Default is a
 random seed from 1 -- 10^7, reported in the output.}
 
-\item{verbosity}{Verbosity of debugging statements.
+\item{post.verbosity}{Verbosity of debugging statements.
 0 (least verbose) -- 4 (most verbose). 0 highly recommended - only change for debugging small examples.}
+
+\item{sampling.input}{An S4 object from \code{\link{hdp_burnin}}.}
 }
 \value{
 A hdpSampleChain object with the salient information from each
