@@ -5,7 +5,7 @@
 \title{Posterior sampling chain across activated DPs.}
 \usage{
 hdp_posterior_sample(
-  posterior_input,
+  post.input,
   post.n,
   post.space,
   post.cpiter = 1,
@@ -26,7 +26,7 @@ random seed from 1 -- 10^7, reported in the output.}
 \item{post.verbosity}{Verbosity of debugging statements.
 0 (least verbose) -- 4 (most verbose). 0 highly recommended - only change for debugging small examples.}
 
-\item{sampling.input}{An S4 object from \code{\link{hdp_burnin}}.}
+\item{sampling_input}{An S4 object from \code{\link{hdp_burnin}}.}
 }
 \value{
 A hdpSampleChain object with the salient information from each

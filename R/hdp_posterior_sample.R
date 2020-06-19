@@ -25,7 +25,7 @@
 #' @importClassesFrom Matrix dgCMatrix
 #' @export
 
-hdp_posterior_sample <- function(posterior_input,
+hdp_posterior_sample <- function(post.input,
                                  post.n,
                                  post.space,
                                  post.cpiter=1,
@@ -36,18 +36,18 @@ hdp_posterior_sample <- function(posterior_input,
 
   ## check the class of input from hdp_burnin or hdp_posterior_sample
 
-  if(class(posterior_input)[1] == "hdpSampleChain"){ #extend Gibbs sampling
+  if(class(post.input)[1] == "hdpSampleChain"){ #extend Gibbs sampling
 
     message("Extend Gibbs Sampling")
 
-    posterior_input <-  hdpx:::as.list(posterior_input)
+    post.input <-  hdpx:::as.list(post.input)
 
     #pick up from the end of last gibbs sampling
-    sampling_input <- list(hdplist = hdpx:::as.list(posterior_input$hdp),
-                          likelihood = posterior_input$lik)
+    sampling_input <- list(hdplist = hdpx:::as.list(post.input$hdp),
+                          likelihood = post.input$lik)
 
-  }else if(class(posterior_input) == "list"){
-      sampling_input <- posterior_input
+  }else if(class(post.input) == "list"){
+      sampling_input <- post.input
       message("Gibbs Sampling after Burn-in Iteration")
 
     }else{
