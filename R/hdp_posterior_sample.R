@@ -78,6 +78,13 @@ hdp_posterior_sample <- function(post.input,
   all.lik <- sampling_input$all.lik
   burnin <- length(sampling_input$all.lik) #pass burnin to the final state
   totiter <- post.n * post.space
+
+  # function to return difference in time in minute units
+  mindifftime <- function(t1, t2){
+    as.numeric(t2-t1, units="mins")
+  }
+
+  prevtime <- Sys.time()
   # collect post.n posterior samples
   for (samp in 1:post.n){
 
@@ -92,11 +99,11 @@ hdp_posterior_sample <- function(post.input,
     #report time every 10 samples if > 1 min has passed
     tracktime <- Sys.time()
     curriter <- curriter + post.space
-
-    if (samp %% 10 == 0){
-      elapsedtime <- (tracktime - starttime)/60
+    if (mindifftime(prevtime, tracktime) > 1 & samp %% 10 == 0){
+      elapsedtime <- mindifftime(starttime, tracktime)
       print(sprintf("time %1.1f ETC %1.1f mins",
                     elapsedtime, elapsedtime / curriter * totiter))
+      prevtime <- tracktime
     }
   }
 

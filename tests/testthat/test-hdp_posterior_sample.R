@@ -13,14 +13,14 @@ test_that("hdp_posterior_sample", {
   set.seed(44)
 
 
-  retvalx <- hdp_posterior_sample(posterior_input = reg$retvalx,
+  retvalx <- hdp_posterior_sample(post.input = reg$retvalx,
                                        post.n          = 15,
                                        post.space      = 10,
                                        post.cpiter     = 3,
                                        seed            = 44,
                                        post.verbosity  = 0)
 
-  retvalx.extend <- hdp_posterior_sample(posterior_input = retvalx,
+  retvalx.extend <- hdp_posterior_sample(post.input = retvalx,
                                          post.n          = 15,
                                          post.space      = 10,
                                          post.cpiter     = 3,
