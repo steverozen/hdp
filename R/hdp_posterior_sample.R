@@ -9,7 +9,7 @@
 #' independent HDP sampling chains in a hdpSampleMulti object via \code{\link{hdp_multi_chain}}.
 #' Components are extracted via \code{\link{hdp_extract_components}}.
 #'
-#' @param sampling_input An S4 object from \code{\link{hdp_burnin}}.
+#' @param post.input An S4 object from \code{\link{hdp_burnin}}.
 #' @param post.n The number of posterior samples to collect.
 #' @param post.space The number of iterations between collected samples.
 #' @param post.cpiter The number of iterations of concentration parameter sampling to perform after each iteration.
@@ -40,14 +40,14 @@ hdp_posterior_sample <- function(post.input,
 
     message("Extend Gibbs Sampling")
 
-    post.input <-  hdpx:::as.list(post.input)
+    post.input <- as.list(post.input)
 
     #pick up from the end of last gibbs sampling
-    sampling_input <- list(hdplist = hdpx:::as.list(post.input$hdp),
+    sampling.input <- list(hdplist = as.list(post.input$hdp),
                           likelihood = post.input$lik)
 
   }else if(class(post.input) == "list"){
-      sampling_input <- post.input
+      sampling.input <- post.input
       message("Gibbs Sampling after Burn-in Iteration")
 
     }else{
@@ -56,9 +56,9 @@ hdp_posterior_sample <- function(post.input,
   }
 
   # input checks
-  ## check sampling_input
+  ## check sampling.input
 
-  hdplist <- sampling_input$hdplist
+  hdplist <- sampling.input$hdplist
 
   if (post.cpiter < 1 | post.cpiter %% 1 != 0) stop("post.cpiter must be a positive integer")
 
@@ -71,12 +71,12 @@ hdp_posterior_sample <- function(post.input,
   curriter <- 0 #keep track of time
   sample  <- list()
 
-  if(!exists("all.lik",where = sampling_input)){
-    sampling_input$all.lik <- sampling_input$likelihood
+  if(!exists("all.lik",where = sampling.input)){
+    sampling.input$all.lik <- sampling.input$likelihood
   } ##all.lik is not available every time
 
-  all.lik <- sampling_input$all.lik
-  burnin <- length(sampling_input$all.lik) #pass burnin to the final state
+  all.lik <- sampling.input$all.lik
+  burnin <- length(sampling.input$all.lik) #pass burnin to the final state
   totiter <- post.n * post.space
 
   # function to return difference in time in minute units
@@ -101,7 +101,7 @@ hdp_posterior_sample <- function(post.input,
     curriter <- curriter + post.space
     if (mindifftime(prevtime, tracktime) > 1 & samp %% 10 == 0){
       elapsedtime <- mindifftime(starttime, tracktime)
-      print(sprintf("time %1.1f ETC %1.1f mins",
+      print(sprintf("Current sampling: %1.1f mins;Estimated Time of Completion: %1.1f mins",
                     elapsedtime, elapsedtime / curriter * totiter))
       prevtime <- tracktime
     }

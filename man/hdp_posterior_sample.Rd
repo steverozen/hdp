@@ -14,6 +14,8 @@ hdp_posterior_sample(
 )
 }
 \arguments{
+\item{post.input}{An S4 object from \code{\link{hdp_burnin}}.}
+
 \item{post.n}{The number of posterior samples to collect.}
 
 \item{post.space}{The number of iterations between collected samples.}
@@ -25,8 +27,6 @@ random seed from 1 -- 10^7, reported in the output.}
 
 \item{post.verbosity}{Verbosity of debugging statements.
 0 (least verbose) -- 4 (most verbose). 0 highly recommended - only change for debugging small examples.}
-
-\item{sampling_input}{An S4 object from \code{\link{hdp_burnin}}.}
 }
 \value{
 A hdpSampleChain object with the salient information from each
