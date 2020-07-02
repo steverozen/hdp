@@ -5,6 +5,7 @@
 #' Any new components in this case are prefixed with "N".
 #'
 #' @param x hdpSampleChain or hdpSampleMulti object
+#' @param cluster.method A \code{kccaFamily} object in \code{flexclust} package.
 #' @param cos.merge Merge components with cosine similarity above this threshold (default 0.90)
 #' @param min.sample Components must have significant exposure in at least this many samples (i.e. those DP nodes with data assigned) (default 1)
 #' @return A hdpSampleChain or hdpSampleMulti object updated with component information
@@ -16,7 +17,10 @@
 #' @export
 # @examples
 # hdp_extract_components(mut_example_multi)
-hdp_extract_components <- function(x, cos.merge=0.90, min.sample=1){
+hdp_extract_components <- function(x,
+                                   cluster.method = "kmedians",
+                                   cos.merge      = 0.90,
+                                   min.sample     = 1){
 
   # input checks
   if (class(x)=="hdpSampleChain") {
@@ -116,7 +120,7 @@ hdp_extract_components <- function(x, cos.merge=0.90, min.sample=1){
 
     rapch_clust <- flexclust::kcca(rapch_unlist, k=rapch_ic,
                                    group=rapch_gf,
-                                   family=flexclust::kccaFamily("kmedians",
+                                   family=flexclust::kccaFamily(cluster.method,
                                                                 groupFun="differentClusters"))
 
     rapch_label <- split(flexclust::clusters(rapch_clust), rapch_gf)
@@ -185,7 +189,7 @@ hdp_extract_components <- function(x, cos.merge=0.90, min.sample=1){
 
     ccc_clust <- flexclust::kcca(ccc_unlist, k=initial_clust,
                                  group=groupfactor,
-                                 family=flexclust::kccaFamily("kmedians",
+                                 family=flexclust::kccaFamily(cluster.method,
                                                               groupFun="differentClusters"))
 
     # want this plot to be as simple as possible

@@ -53,7 +53,9 @@ hdp_posterior_sample <- function(post.input,
     }else{
     message("Input is not a hdpSampleChain or a list from hdp_burnin")
     stop()
-  }
+    }
+
+  remove(post.input)
 
   # input checks
   ## check sampling.input
