@@ -7,8 +7,11 @@
 #' @param x hdpSampleChain or hdpSampleMulti object
 #' @param cos.merge Merge components with cosine similarity above this threshold (default 0.90)
 #' @param min.sample Components must have significant exposure in at least this many samples (i.e. those DP nodes with data assigned) (default 1)
-#' @param categ.CI A numeric between 0 and 1. Level of confidence interval to be calculated for each category
-#' @param exposure.CI A numeric between 0 and 1. Level of confidence interval to be calculated for a sample's exposure/observation                       of a raw cluster/proto-signature
+#' @param categ.CI A numeric between 0 and 1. Level of confidence interval to be calculated for each category.
+#'                  Default is 0.95, but can be set to lower for extracting rare signatures
+#' @param exposure.CI A numeric between 0 and 1. Level of confidence interval to be calculated
+#'                    for a sample's exposure/observation of a raw cluster/proto-signature.
+#'                    Default is 0.95, but can be set to lower for extracting rare signatures
 #' @param cluster.method  a temporary argument
 
 #' @return A hdpSampleChain or hdpSampleMulti object updated with component information
@@ -20,15 +23,13 @@
 #' @export
 # @examples
 # hdp_extract_components(mut_example_multi)
-
 hdp_merge_and_extract_components <- function(x,
                                              cluster.method = "kmedians",
                                              categ.CI    = 0.95,
-                                             exposure.CI = 0.95,
+                                             exposure.CI = 0.90,
                                              cos.merge   = 0.90,
                                              min.sample  = 1){
 
-  x <- hdpx::hdp_multi_chain(clean.chlist)
   # input checks
   if (class(x)=="hdpSampleChain") {
     warning('Extracting components on single posterior sampling chain. Recommend switching to multiple independent chains in a hdpSampleMulti object, see ?hdp_multi_chain')
@@ -79,14 +80,8 @@ hdp_merge_and_extract_components <- function(x,
   # cdc (clust_dp_counts) matrix have the
   # same number of columns
 
-
-
-
-  clust_label <- 1:maxclust
-
   ccc_0 <- lapply(chlist, function(ch){
     lapply(clust_categ_counts(ch), function(x){
-      #ans <- cbind(x, matrix(0, nrow=ncat, ncol=(maxclust-ncol(x)+1)))
       ans <- cbind(x)
       return(ans[, -ncol(ans)])
     })
@@ -95,7 +90,6 @@ hdp_merge_and_extract_components <- function(x,
 
   cdc_0 <- lapply(chlist, function(ch){
     lapply(clust_dp_counts(ch), function(x){
-      #ans <- cbind(x, matrix(0, nrow=ndp, ncol=(maxclust-ncol(x)+1)))
       ans <- cbind(x)
       return(ans[, -ncol(ans)])
     })
@@ -116,7 +110,7 @@ hdp_merge_and_extract_components <- function(x,
       clust_label <- 1:ncol(ccc_temp[[j]])
 
       clust_cos <- lsa::cosine(ccc_temp[[j]])
-      clust_same <- (clust_cos > 0.99 & lower.tri(clust_cos))
+      clust_same <- (clust_cos > 0.95 & lower.tri(clust_cos))
       same <- which(clust_same, arr.ind=TRUE) # merge these columns
       if (length(same)>0){
         for (index in 1:nrow(same)){
@@ -203,6 +197,11 @@ hdp_merge_and_extract_components <- function(x,
 
   } else{
     ccc_unlist <- t(do.call(cbind, ccc_1))
+    for(i in 1:nrow(ccc_unlist)){
+      if(sum(ccc_unlist[i,])>0){
+        ccc_unlist[i,] <- ccc_unlist[i,]/sum(ccc_unlist[i,])
+      }
+    }
     groupfactor <- rep(1:(nsamp), each=mclust)
     initial_clust <- rep(1:mclust, times=nsamp)
 
