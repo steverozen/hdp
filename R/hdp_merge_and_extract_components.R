@@ -10,6 +10,7 @@
 #' @param categ.CI A numeric between 0 and 1. Level of confidence interval to be calculated for each category
 #' @param exposure.CI A numeric between 0 and 1. Level of confidence interval to be calculated for a sample's exposure/observation                       of a raw cluster/proto-signature
 #' @param cluster.method  a temporary argument
+
 #' @return A hdpSampleChain or hdpSampleMulti object updated with component information
 #' @aliases hdp_extract_components
 #' @seealso \code{\link{hdp_posterior}}, \code{\link{hdp_multi_chain}},
@@ -208,6 +209,7 @@ hdp_merge_and_extract_components <- function(x,
     ccc_clust <- flexclust::kcca(ccc_unlist, k=initial_clust,
                                  group=groupfactor,
                                  family=flexclust::kccaFamily(cluster.method,
+
                                                               groupFun="differentClusters"))
 
     # want this plot to be as simple as possible
