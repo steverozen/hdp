@@ -310,6 +310,7 @@ hdp_merge_and_extract_components <- function(x,
   }
 
   avgdistn_ccc4 <- matrix(0, nrow=ncat, ncol=ncol(ccc_4[[1]]))
+
   for (i in 1:ncol(ccc_4[[1]])){
     distns <- sapply(ccc_4, function(x) x[, i]/sum(x[, i]))
     avgdistn_ccc4[, i] <- rowMeans(distns, na.rm=T)
