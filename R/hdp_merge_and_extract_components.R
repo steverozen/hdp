@@ -310,6 +310,7 @@ hdp_merge_and_extract_components <- function(x,
   }
 
   avgdistn_ccc4 <- matrix(0, nrow=ncat, ncol=ncol(ccc_4[[1]]))
+
   for (i in 1:ncol(ccc_4[[1]])){
     distns <- sapply(ccc_4, function(x) x[, i]/sum(x[, i]))
     avgdistn_ccc4[, i] <- rowMeans(distns, na.rm=T)
@@ -455,14 +456,15 @@ hdp_merge_and_extract_components <- function(x,
 
   x@comp_cos_merge <- cos.merge
 
-  x@aggregated_raw_clusters_after_cosmerge <- avgdistn_ccc3
-
-  x@aggregated_raw_clusters_after_nonzero_categ <- avgdistn_ccc4
 
   x@comp_categ_counts <- ccc_ans
   x@comp_dp_counts <- lapply(cdc_ans, as, "dgCMatrix")
+
   x@comp_categ_distn <- list(mean=ccc_mean,
-                             cred.int=ccc_credint)
+                             cred.int=ccc_credint,
+                             aggregated_raw_clusters_after_cos_merge = avgdistn_ccc3,
+                             aggregated_raw_clusters_after_nonzero_categ = avgdistn_ccc4)
+
   x@comp_dp_distn <- list(mean=cdc_mean,
                           cred.int=cdc_credint)
 
