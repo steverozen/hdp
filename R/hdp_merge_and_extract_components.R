@@ -99,6 +99,8 @@ hdp_merge_and_extract_components <- function(x,
 
 
   #######################################
+
+  ##merge clusters with cosine.similarity > 0.95
   clust.number <- {}
 
   for(i in 1:length(ccc_0)){
@@ -127,6 +129,7 @@ hdp_merge_and_extract_components <- function(x,
 
   }
 
+  ##every ccc and cdc has the same number of columns
   maxclust <- max(clust.number)
 
   for(i in 1:length(ccc_0)){
@@ -256,7 +259,7 @@ hdp_merge_and_extract_components <- function(x,
     }
     #remove(i)
   }
-  avgdistn.new <- hdpx:::merge_cols(avgdistn,clust_label)
+  avgdistn_ccc3 <- hdpx:::merge_cols(avgdistn,clust_label)
   ccc_3 <- lapply(ccc_2, hdpx:::merge_cols, clust_label)
   cdc_3 <- lapply(cdc_2, hdpx:::merge_cols, clust_label)
   clust_label <- colnames(ccc_3[[1]])
@@ -305,6 +308,13 @@ hdp_merge_and_extract_components <- function(x,
     })
 
   }
+
+  avgdistn_ccc4 <- matrix(0, nrow=ncat, ncol=ncol(ccc_4[[1]]))
+  for (i in 1:ncol(ccc_4[[1]])){
+    distns <- sapply(ccc_4, function(x) x[, i]/sum(x[, i]))
+    avgdistn_ccc4[, i] <- rowMeans(distns, na.rm=T)
+  }
+
   clust_label <- colnames(cdc_4[[1]])
   if (any(clust_label != colnames(cdc_4))) stop("problem in step 4!")
 
@@ -336,10 +346,6 @@ hdp_merge_and_extract_components <- function(x,
   cdc_5 <- lapply(cdc_4, hdpx:::merge_cols, clust_label)
   clust_label <- colnames(ccc_5[[1]])
   if (any(clust_label != colnames(cdc_5))) stop("problem in step 5!")
-
-
-
-
 
   remove(compii, ccc_4, cdc_4, ii, lowerb, use_clust, disregard)
 
@@ -448,6 +454,10 @@ hdp_merge_and_extract_components <- function(x,
   x@prop.ex <- round(1-avcount[1]/sum(avcount), 3)
 
   x@comp_cos_merge <- cos.merge
+
+  x@aggregated_raw_clusters_after_cosmerge <- avgdistn_ccc3
+
+  x@aggregated_raw_clusters_after_nonzero_categ <- avgdistn_ccc4
 
   x@comp_categ_counts <- ccc_ans
   x@comp_dp_counts <- lapply(cdc_ans, as, "dgCMatrix")
