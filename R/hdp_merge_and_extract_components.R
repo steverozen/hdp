@@ -100,7 +100,7 @@ hdp_merge_and_extract_components <- function(x,
 
   #######################################
 
-  ##merge clusters with cosine.similarity > 0.95
+  ## At each sample point in the chain, merge clusters with cosine.similarity > 0.95
   clust.number <- {}
 
   for(i in 1:length(ccc_0)){
@@ -200,6 +200,13 @@ hdp_merge_and_extract_components <- function(x,
 
   } else{
     ccc_unlist <- t(do.call(cbind, ccc_1))
+
+    # Change from NR code - the k medians clustering is
+    # sensitive to the raw counts, so somethimes
+    # clusters with the same profile are not identified
+    # as such. So here we normalize by dividing the the
+    # partial spectrum by the total number of mutations
+    # in it.
     for(i in 1:nrow(ccc_unlist)){
       if(sum(ccc_unlist[i,])>0){
         ccc_unlist[i,] <- ccc_unlist[i,]/sum(ccc_unlist[i,])
@@ -268,7 +275,7 @@ hdp_merge_and_extract_components <- function(x,
   remove(avgdistn, distns, clust_cos, clust_same, same, ccc_2, cdc_2)
 
 
-  # Step (4) maybe #remove this step??
+  # Step (4)
   # Assign components with no *significantly* non-zero data categories
   # to component '0'
   use_clust <- c()
