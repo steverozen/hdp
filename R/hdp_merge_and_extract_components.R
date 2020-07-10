@@ -316,6 +316,8 @@ hdp_merge_and_extract_components <- function(x,
 
   }
 
+  # Change from NR code: back pointers to the constuents
+  # ccc_4 element.
   avgdistn_ccc4 <- matrix(0, nrow=ncat, ncol=ncol(ccc_4[[1]]))
 
   for (i in 1:ncol(ccc_4[[1]])){
