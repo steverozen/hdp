@@ -15,14 +15,13 @@
 #' @param cluster.method  a temporary argument
 
 #' @return A hdpSampleChain or hdpSampleMulti object updated with component information
-#' @aliases hdp_extract_components
+#' @aliases hdp_merge_and_extract_components
 #' @seealso \code{\link{hdp_posterior}}, \code{\link{hdp_multi_chain}},
 #'  \code{\link{plot_comp_size}}, \code{\link{plot_comp_distn}},
 #'  \code{\link{plot_dp_comp_exposure}}
 #' @import clue
 #' @export
-# @examples
-# hdp_extract_components(mut_example_multi)
+
 hdp_merge_and_extract_components <- function(x,
                                              cluster.method = "kmedians",
                                              categ.CI    = 0.95,
@@ -120,8 +119,8 @@ hdp_merge_and_extract_components <- function(x,
         }
       }
 
-      ccc_temp[[j]] <- hdpx:::merge_cols(ccc_temp[[j]],clust_label)
-      cdc_temp[[j]] <- hdpx:::merge_cols(cdc_temp[[j]],clust_label)
+      ccc_temp[[j]] <- merge_cols(ccc_temp[[j]],clust_label)
+      cdc_temp[[j]] <- merge_cols(cdc_temp[[j]],clust_label)
       clust.number <- c(clust.number,ncol(ccc_temp[[j]]))
     }
     ccc_0[[i]] <- ccc_temp
@@ -266,9 +265,9 @@ hdp_merge_and_extract_components <- function(x,
     }
     #remove(i)
   }
-  avgdistn_ccc3 <- hdpx:::merge_cols(avgdistn,clust_label)
-  ccc_3 <- lapply(ccc_2, hdpx:::merge_cols, clust_label)
-  cdc_3 <- lapply(cdc_2, hdpx:::merge_cols, clust_label)
+  avgdistn_ccc3 <- merge_cols(avgdistn,clust_label)
+  ccc_3 <- lapply(ccc_2, merge_cols, clust_label)
+  cdc_3 <- lapply(cdc_2, merge_cols, clust_label)
   clust_label <- colnames(ccc_3[[1]])
   if (any(clust_label != colnames(cdc_3))) stop("problem in step 3!")
 
@@ -278,6 +277,7 @@ hdp_merge_and_extract_components <- function(x,
   # Step (4)
   # Assign components with no *significantly* non-zero data categories
   # to component '0'
+  clust_hdp0_ccc4 <- data.frame(matrix(ncol=0,nrow=ncat))
   use_clust <- c()
   for (ii in 1:ncol(ccc_3[[1]])) {
     compii <- sapply(ccc_3, function(x) x[,ii])
@@ -290,14 +290,22 @@ hdp_merge_and_extract_components <- function(x,
 
       }
     })
-    if(any(lowerb>0)) use_clust <- c(use_clust, colnames(ccc_3[[1]])[ii])
+    if(any(lowerb>0)){
+      use_clust <- c(use_clust, colnames(ccc_3[[1]])[ii])
+    }else{
+      ##I want to summarize how many mutations of which cluster were moved into hdp.0 -- Mo
+      clust_hdp0_ccc4 <- cbind(clust_hdp0_ccc4,rowSums(compii))
+
+      colnames(clust_hdp0_ccc4)[ncol(clust_hdp0_ccc4)] <- paste("ccc_3_",colnames(ccc_3[[1]])[ii],sep="")
+    }
   }
+
 
   # update clust_label vector
   clust_label[which(!clust_label %in% use_clust)] <- '0'
-  ccc_4 <- lapply(ccc_3, hdpx:::merge_cols, clust_label)
+  ccc_4 <- lapply(ccc_3, merge_cols, clust_label)
 
-  cdc_4 <- lapply(cdc_3, hdpx:::merge_cols, clust_label)
+  cdc_4 <- lapply(cdc_3, merge_cols, clust_label)
 
   # if there was no component zero added, add an empty one now
   if (!"0" %in% clust_label) {
@@ -335,6 +343,8 @@ hdp_merge_and_extract_components <- function(x,
   # to component '0' (disregarding DP nodes with no data items (parent nodes))
   use_clust <- c()
   disregard <- if(is_prior) union(which(numdata==0), pseudo) else which(numdata==0)
+  clust_hdp0_ccc5 <- data.frame(matrix(ncol=0,nrow=ncat))
+
   for (ii in 1:ncol(cdc_4[[1]])) {
     compii <- sapply(cdc_4, function(x) x[,ii])
     lowerb <- apply(compii[-disregard,], 1, function(y) {
@@ -347,13 +357,23 @@ hdp_merge_and_extract_components <- function(x,
 
       }
     })
-    if(sum(lowerb>0)>=min.sample) use_clust <- c(use_clust, colnames(cdc_4[[1]])[ii])
+    if(sum(lowerb>0)>=min.sample){
+      use_clust <- c(use_clust, colnames(cdc_4[[1]])[ii])
+    }else{
+      ##I want to summarize how many mutations of which cluster were moved into hdp.0 -- Mo
+      ccc_compii <- sapply(ccc_4, function(x) x[,ii])
+
+      clust_hdp0_ccc5 <- cbind(clust_hdp0_ccc5,rowSums(ccc_compii))
+
+      colnames(clust_hdp0_ccc5)[ncol(clust_hdp0_ccc5)] <- paste("ccc_4_",colnames(ccc_4[[1]])[ii],sep="")
+    }
   }
+
 
   # update clust_label vector
   clust_label[which(!clust_label %in% use_clust)] <- 0
-  ccc_5 <- lapply(ccc_4, hdpx:::merge_cols, clust_label)
-  cdc_5 <- lapply(cdc_4, hdpx:::merge_cols, clust_label)
+  ccc_5 <- lapply(ccc_4, merge_cols, clust_label)
+  cdc_5 <- lapply(cdc_4, merge_cols, clust_label)
   clust_label <- colnames(ccc_5[[1]])
   if (any(clust_label != colnames(cdc_5))) stop("problem in step 5!")
 
@@ -469,10 +489,13 @@ hdp_merge_and_extract_components <- function(x,
   x@comp_categ_counts <- ccc_ans
   x@comp_dp_counts <- lapply(cdc_ans, as, "dgCMatrix")
 
-  x@comp_categ_distn <- list(mean=ccc_mean,
-                             cred.int=ccc_credint,
-                             aggregated_raw_clusters_after_cos_merge = avgdistn_ccc3,
-                             aggregated_raw_clusters_after_nonzero_categ = avgdistn_ccc4)
+
+  x@comp_categ_distn <- list(mean                                        = ccc_mean,
+                             cred.int                                    = ccc_credint,
+                             aggregated_raw_clusters_after_cos_merge     = avgdistn_ccc3,
+                             aggregated_raw_clusters_after_nonzero_categ = avgdistn_ccc4,
+                             clust_hdp0_ccc4                             = clust_hdp0_ccc4,
+                             clust_hdp0_ccc5                             = clust_hdp0_ccc5)
 
   x@comp_dp_distn <- list(mean=cdc_mean,
                           cred.int=cdc_credint)

@@ -2,7 +2,6 @@
 % Please edit documentation in R/hdp_merge_and_extract_components.R
 \name{hdp_merge_and_extract_components}
 \alias{hdp_merge_and_extract_components}
-\alias{hdp_extract_components}
 \title{Extract major components from the raw clusters}
 \usage{
 hdp_merge_and_extract_components(
