@@ -1,6 +1,6 @@
 Package: hdpx
 Title: Forked from Nicola Robert's Hierarchical Dirichlet Process for categorical count data
-Version: 0.1.5.0019
+Version: 0.1.5.0020
 Authors@R: c(person("Steve", "Rozen", email="steverozen@gmail.com", role="aut"),
   person("Nicola", "Roberts", email="nr3@sanger.ac.uk", role=c("aut", "cre")),
   person("Yee Whye", "Teh", role=c("aut", "cph"),
@@ -41,6 +41,7 @@ Collate:
     'aaa-generics-input.R'
     'aaa-generics-output.R'
     'cull_posterior_samples.R'
+    'diagnostic_in_extraction.R'
     'dp_activate.R'
     'dp_freeze.R'
     'hdp.R'

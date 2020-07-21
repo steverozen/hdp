@@ -16,7 +16,7 @@
 #' @param diagnostic.folder If provided, details for hdp.0 is plotted
 #'
 #' @return A hdpSampleChain or hdpSampleMulti object updated with component information
-#' @aliases hdp_extract_components
+#' @aliases hdp_merge_and_extract_components
 #' @seealso \code{\link{hdp_posterior}}, \code{\link{hdp_multi_chain}},
 #'  \code{\link{plot_comp_size}}, \code{\link{plot_comp_distn}},
 #'  \code{\link{plot_dp_comp_exposure}}
@@ -115,8 +115,8 @@ hdp_merge_and_extract_components <- function(x,
       }
     }
 
-    ccc <- hdpx:::merge_cols(ccc,clust_label)
-    cdc <- hdpx:::merge_cols(cdc,clust_label)
+    ccc <- merge_cols(ccc,clust_label)
+    cdc <- merge_cols(cdc,clust_label)
     return(list(ccc=ccc,cdc=cdc))
   }
 
@@ -279,6 +279,37 @@ hdp_merge_and_extract_components <- function(x,
   clust_label <- colnames(ccc_3[[1]])
   if (any(clust_label != colnames(cdc_3))) stop("problem in step 3!")
 
+  ##more steps of doing merging. Some merged raw clusters have high cos sim
+  for(iter.index in 1:10){
+
+    avgdistn <- matrix(0, nrow=ncat, ncol=ncol(ccc_3[[1]]))
+    for (i in 1:ncol(ccc_3[[1]])){
+      distns <- sapply(ccc_3, function(x) x[, i]/sum(x[, i]))
+      avgdistn[, i] <- rowMeans(distns, na.rm=T)
+    }
+    clust_cos <- lsa::cosine(avgdistn)
+    clust_same <- (clust_cos > cos.merge & lower.tri(clust_cos))
+    same <- which(clust_same, arr.ind=TRUE) # merge these columns
+    if(length(same)==0){
+      message("no more merging")
+      break
+    }else{
+      message("extra merging")
+      for (i in 1:nrow(same)){
+        clust_label[same[i, 1]] <- clust_label[same[i, 2]]
+      }
+      #remove(i)
+      avgdistn_ccc3 <- merge_cols(avgdistn,clust_label)
+      ccc_3 <- lapply(ccc_3, merge_cols, clust_label)
+      cdc_3 <- lapply(cdc_3, merge_cols, clust_label)
+      clust_label <- colnames(ccc_3[[1]])
+      if (any(clust_label != colnames(cdc_3))) stop("problem in step 3!")
+    }
+    # update clust_label vector to reflect the merging of columns.
+
+  }
+
+
   remove(avgdistn, distns, clust_cos, clust_same, same, ccc_2, cdc_2)
 
 
@@ -311,9 +342,24 @@ hdp_merge_and_extract_components <- function(x,
 
   # update clust_label vector
   clust_label[which(!clust_label %in% use_clust)] <- '0'
+
   ccc_4 <- lapply(ccc_3, merge_cols, clust_label)
 
   cdc_4 <- lapply(cdc_3, merge_cols, clust_label)
+
+  # Change from NR code: back pointers to the constuents
+  # ccc_4 element.
+  avgdistn_ccc4 <- matrix(0, nrow=ncat, ncol=ncol(ccc_4[[1]]))
+
+  for (i in 1:ncol(ccc_4[[1]])){
+    distns <- sapply(ccc_4, function(x) x[, i])
+    avgdistn_ccc4[, i] <- rowSums(distns, na.rm=T)
+  }
+  colnames(avgdistn_ccc4) <- colnames(cdc_4[[1]])
+  clust_label <- colnames(cdc_4[[1]])
+
+  if (any(clust_label != colnames(cdc_4))) stop("problem in step 4!")
+
 
   # if there was no component zero added, add an empty one now
   if (!"0" %in% clust_label) {
@@ -331,19 +377,6 @@ hdp_merge_and_extract_components <- function(x,
     })
 
   }
-
-  # Change from NR code: back pointers to the constuents
-  # ccc_4 element.
-  avgdistn_ccc4 <- matrix(0, nrow=ncat, ncol=ncol(ccc_4[[1]]))
-
-  for (i in 1:ncol(ccc_4[[1]])){
-    distns <- sapply(ccc_4, function(x) x[, i])
-    avgdistn_ccc4[, i] <- rowSums(distns, na.rm=T)
-  }
-  colnames(avgdistn_ccc4) <- colnames(cdc_4[[1]])
-  clust_label <- colnames(cdc_4[[1]])
-
-  if (any(clust_label != colnames(cdc_4))) stop("problem in step 4!")
 
   ##Added by Mo: create diagnostic plot to trace back hdp.0
 
@@ -373,80 +406,21 @@ hdp_merge_and_extract_components <- function(x,
 
       ##plot3 each cluster in clust_hdp0_ccc4 has a new folder
 
-      nsampchain <- nsamp/nch
+
+      diagnostic.retval <- diagnostic_in_extraction(clust_hdp0_ccc = clust_hdp0_ccc4,
+                                                    nsamp          = nsamp,
+                                                    ncat           = ncat,
+                                                    nch            = nch,
+                                                    ccc            = ccc_3,
+                                                    cdc            = cdc_3,
+                                                    diagnostic.folder = diagnostic.folder)
 
 
-
-      for(i in 1:ncol(clust_hdp0_ccc4)){
-        summary.matrix <- data.frame(colnames(clust_hdp0_ccc4))
-        cluster.pattern <- clust_hdp0_ccc4[,i]
-        cluster.name <- colnames(clust_hdp0_ccc4)[i]
-
-        if (!dir.exists(file.path(diagnostic.folder,cluster.name))) {
-
-          dir.create(file.path(diagnostic.folder,cluster.name), recursive = T)
-        }
-
-        ccc_3_cluster <- which(colnames(ccc_3[[1]]) == unlist(strsplit(cluster.name,"[_]",perl=T))[3])
-
-
-        summary.cluster <- data.frame(matrix(ncol=0,nrow=nsamp))
-
-        individual.catalog <- data.frame(matrix(nrow=ncat,ncol=0))
-
-
-        for(index.i in 1:nch){
-
-          for(index.j in 1:nsampchain){
-
-            index <- (index.i-1)*nsampchain+index.j
-
-            temp.matrix <- ccc_3[[index]]
-            temp.cdc.matrix <- cdc_3[[index]]
-
-            summary.cluster$chain[index] <- paste("chain.",index.i,sep="")
-
-            summary.cluster$sequence[index] <- 0
-            summary.cluster$exposures[index] <- 0
-            summary.cluster$sample[index] <- index.j
-
-
-            if(sum(temp.matrix[,ccc_3_cluster])>0){
-              cosine <- lsa::cosine(temp.matrix[,ccc_3_cluster],cluster.pattern)
-              individual.catalog <- cbind(individual.catalog,temp.matrix[,ccc_3_cluster])
-              if(cosine>0.95){
-                summary.cluster$sequence[index] <- index.i
-                summary.cluster$exposures[index] <- sum(temp.cdc.matrix[,ccc_3_cluster])
-
-              }
-            }
-
-
-          }
-
-        }
-
-        row.names(individual.catalog) <- ICAMS::catalog.row.order$SBS96
-        individual.catalog.catalog <- ICAMS::as.catalog(individual.catalog,catalog.type = "counts")
-        ICAMS::PlotCatalogToPdf(individual.catalog.catalog,
-                         file.path(diagnostic.folder,cluster.name,"/individual.raw.cluster.pdf"))
-        grDevices::pdf(file.path(diagnostic.folder,cluster.name,"/cluster.in.Gibbs.sample.pdf"))
-        plot.1 <- ggplot2::ggplot(data=summary.cluster, aes(x=sample, y=sequence, group=chain,color=chain)) +
-          ggplot2::geom_point()+ggplot2::ggtitle(paste0(cluster.name," in Gibbs sample")) + ggplot2::xlab("Posterior.Sample") +  ggplot2::ylab("Chain")
-        plot(plot.1)
-        grDevices::dev.off()
-
-        grDevices::pdf(file.path(diagnostic.folder,cluster.name,"/cluster.exposure.in.Gibbs.sample.pdf"))
-        plot.2 <- ggplot2::ggplot(data=summary.cluster, aes(x=sample, y=exposures, group=chain,color=chain)) +
-          ggplot2::geom_point()+ggplot2::ggtitle(paste0("exposures of ",cluster.name," in Gibbs sample"))+ ggplot2::xlab("Posterior.Sample") +  ggplot2::ylab("Exposure")
-        plot(plot.2)
-        grDevices::dev.off()
-      }
     }
   }
 
 
-  remove(compii, ccc_3, cdc_3, ii, lowerb, use_clust)
+  remove(compii, ccc_3, cdc_3, ii, lowerb, use_clust,diagnostic.retval)
 
   # Step (5)
   # Assign components with < min.sample *significantly* non-zero sample exposure
@@ -515,81 +489,21 @@ hdp_merge_and_extract_components <- function(x,
 
       ##plot3 each cluster in clust_hdp0_ccc4 has a new folder
 
-      nsampchain <- nsamp/nch
 
-
-
-      for(i in 1:ncol(clust_hdp0_ccc5)){
-        summary.matrix <- data.frame(colnames(clust_hdp0_ccc5))
-        cluster.pattern <- clust_hdp0_ccc5[,i]
-        cluster.name <- colnames(clust_hdp0_ccc5)[i]
-
-        if (!dir.exists(file.path(diagnostic.folder,cluster.name))) {
-
-          dir.create(file.path(diagnostic.folder,cluster.name), recursive = T)
-        }
-
-        ccc_4_cluster <- which(colnames(ccc_4[[1]]) == unlist(strsplit(cluster.name,"[_]",perl=T))[3])
-
-
-        summary.cluster <- data.frame(matrix(ncol=0,nrow=nsamp))
-
-        individual.catalog <- data.frame(matrix(nrow=ncat,ncol=0))
-
-
-        for(index.i in 1:nch){
-
-          for(index.j in 1:nsampchain){
-
-            index <- (index.i-1)*nsampchain+index.j
-
-            temp.matrix <- ccc_4[[index]]
-            temp.cdc.matrix <- cdc_4[[index]]
-
-            summary.cluster$chain[index] <- paste("chain.",index.i,sep="")
-
-            summary.cluster$sequence[index] <- 0
-            summary.cluster$exposures[index] <- 0
-            summary.cluster$sample[index] <- index.j
-
-
-            if(sum(temp.matrix[,ccc_4_cluster])>0){
-              cosine <- lsa::cosine(temp.matrix[,ccc_4_cluster],cluster.pattern)
-              individual.catalog <- cbind(individual.catalog,temp.matrix[,ccc_4_cluster])
-              if(cosine>0.95){
-                summary.cluster$sequence[index] <- index.i
-                summary.cluster$exposures[index] <- sum(temp.cdc.matrix[,ccc_4_cluster])
-
-              }
-            }
-
-
-          }
-
-        }
-
-        row.names(individual.catalog) <- ICAMS::catalog.row.order$SBS96
-        individual.catalog.catalog <- ICAMS::as.catalog(individual.catalog,catalog.type = "counts")
-        ICAMS::PlotCatalogToPdf(individual.catalog.catalog,
-                                file.path(diagnostic.folder,cluster.name,"/individual.raw.cluster.pdf"))
-        grDevices::pdf(file.path(diagnostic.folder,cluster.name,"/cluster.in.Gibbs.sample.pdf"))
-        plot.1 <- ggplot2::ggplot(data=summary.cluster, aes(x=sample, y=sequence, group=chain,color=chain)) +
-          ggplot2::geom_point()+ggplot2::ggtitle(paste0(cluster.name," in Gibbs sample")) + ggplot2::xlab("Posterior.Sample") +  ggplot2::ylab("Chain")
-        plot(plot.1)
-        grDevices::dev.off()
-
-        grDevices::pdf(file.path(diagnostic.folder,cluster.name,"/cluster.exposure.in.Gibbs.sample.pdf"))
-        plot.2 <- ggplot2::ggplot(data=summary.cluster, aes(x=sample, y=exposures, group=chain,color=chain)) +
-          ggplot2::geom_point()+ggplot2::ggtitle(paste0("exposures of ",cluster.name," in Gibbs sample"))+ ggplot2::xlab("Posterior.Sample") +  ggplot2::ylab("Exposure")
-        plot(plot.2)
-        grDevices::dev.off()
-      }
+      diagnostic.retval <- diagnostic_in_extraction(clust_hdp0_ccc = clust_hdp0_ccc5,
+                                                    nsamp          = nsamp,
+                                                    ncat           = ncat,
+                                                    nch            = nch,
+                                                    ccc            = ccc_4,
+                                                    cdc            = cdc_4,
+                                                    diagnostic.folder = diagnostic.folder)
     }
   }
 
 
 
-  remove(compii, ccc_4, cdc_4, ii, lowerb, use_clust, disregard)
+
+  remove(compii, ccc_4, cdc_4, ii, lowerb, use_clust, disregard,diagnostic.retval)
 
   # Step (6)
   # Rename overall component, order by number of data items (on average)
