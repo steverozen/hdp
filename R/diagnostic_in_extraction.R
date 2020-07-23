@@ -1,4 +1,4 @@
-#' Diagnostic plotting inside of hdp_merge_and_extract_component function.
+#' Diagnostic plotting inside of hdp_merge_and_extract_components function.
 #' This function generates details of the raw clusters in hdp.0
 #'
 #' @param clust_hdp0_ccc An object in \code{\link{hdp_merge_and_extract_components}}
@@ -10,7 +10,7 @@
 #'
 #' @return The plots of presence of a raw cluster in each chain.
 #' @aliases diagnostic_in_extraction
-#' @seealso \code{\link{hdp_merge_and_extract_component}}
+#' @seealso \code{\link{hdp_merge_and_extract_components}}
 #'
 #' @export
 
@@ -23,7 +23,7 @@ diagnostic_in_extraction <- function(clust_hdp0_ccc,
                                      cdc,
                                      diagnostic.folder){
 
-  chain <- exposures <- NULL
+  chain <- exposures <- nsampchain <- NULL
 
   nsampchain <- nsamp/ncat
   for(i in 1:ncol(clust_hdp0_ccc)){

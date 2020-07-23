@@ -2,7 +2,7 @@
 % Please edit documentation in R/diagnostic_in_extraction.R
 \name{diagnostic_in_extraction}
 \alias{diagnostic_in_extraction}
-\title{Diagnostic plotting inside of hdp_merge_and_extract_component function.
+\title{Diagnostic plotting inside of hdp_merge_and_extract_components function.
 This function generates details of the raw clusters in hdp.0}
 \usage{
 diagnostic_in_extraction(
@@ -30,9 +30,9 @@ diagnostic_in_extraction(
 The plots of presence of a raw cluster in each chain.
 }
 \description{
-Diagnostic plotting inside of hdp_merge_and_extract_component function.
+Diagnostic plotting inside of hdp_merge_and_extract_components function.
 This function generates details of the raw clusters in hdp.0
 }
 \seealso{
-\code{\link{hdp_merge_and_extract_component}}
+\code{\link{hdp_merge_and_extract_components}}
 }

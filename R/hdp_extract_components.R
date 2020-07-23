@@ -22,7 +22,7 @@ hdp_extract_components <- function(x,
 
   # input checks
   if (class(x)=="hdpSampleChain") {
-      warning('Extracting components on single posterior sampling chain. Recommend switching to multiple independent chains in a hdpSampleMulti object, see ?hdp_multi_chain')
+      message('Extracting components on single chain.A hdpSampleMulti object is recommended, see ?hdp_multi_chain')
       is_multi <- FALSE
     } else if (class(x)=="hdpSampleMulti") {
       is_multi <- TRUE

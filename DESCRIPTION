@@ -14,7 +14,9 @@ Imports:
     flexclust,
     coda,
     clue,
-    Matrix
+    Matrix,
+    ggplot2,
+    ICAMS
 LazyData: true
 Description: Model categorical count data with a hierarchical Dirichlet
     Process. Includes functions to initialise a HDP with a custom tree
