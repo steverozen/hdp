@@ -407,20 +407,20 @@ hdp_merge_and_extract_components <- function(x,
       ##plot3 each cluster in clust_hdp0_ccc4 has a new folder
 
 
-      diagnostic.retval <- diagnostic_in_extraction(clust_hdp0_ccc = clust_hdp0_ccc4,
-                                                    nsamp          = nsamp,
-                                                    ncat           = ncat,
-                                                    nch            = nch,
-                                                    ccc            = ccc_3,
-                                                    cdc            = cdc_3,
-                                                    diagnostic.folder = diagnostic.folder)
+      diagnostic_in_extraction(clust_hdp0_ccc = clust_hdp0_ccc4,
+                               nsamp          = nsamp,
+                               ncat           = ncat,
+                               nch            = nch,
+                               ccc            = ccc_3,
+                               cdc            = cdc_3,
+                               diagnostic.folder = diagnostic.folder)
 
 
     }
   }
 
 
-  remove(compii, ccc_3, cdc_3, ii, lowerb, use_clust,diagnostic.retval)
+  remove(compii, ccc_3, cdc_3, ii, lowerb, use_clust)
 
   # Step (5)
   # Assign components with < min.sample *significantly* non-zero sample exposure
@@ -490,20 +490,20 @@ hdp_merge_and_extract_components <- function(x,
       ##plot3 each cluster in clust_hdp0_ccc4 has a new folder
 
 
-      diagnostic.retval <- diagnostic_in_extraction(clust_hdp0_ccc = clust_hdp0_ccc5,
-                                                    nsamp          = nsamp,
-                                                    ncat           = ncat,
-                                                    nch            = nch,
-                                                    ccc            = ccc_4,
-                                                    cdc            = cdc_4,
-                                                    diagnostic.folder = diagnostic.folder)
+      diagnostic_in_extraction(clust_hdp0_ccc = clust_hdp0_ccc5,
+                               nsamp          = nsamp,
+                               ncat           = ncat,
+                               nch            = nch,
+                               ccc            = ccc_4,
+                               cdc            = cdc_4,
+                               diagnostic.folder = diagnostic.folder)
     }
   }
 
 
 
 
-  remove(compii, ccc_4, cdc_4, ii, lowerb, use_clust, disregard,diagnostic.retval)
+  remove(compii, ccc_4, cdc_4, ii, lowerb, use_clust, disregard)
 
   # Step (6)
   # Rename overall component, order by number of data items (on average)
