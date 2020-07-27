@@ -52,6 +52,7 @@ my_hdp <- hdp_adddp(my_hdp, 10, c(rep(2, 5), rep(3, 5)), 3)
 my_hdp <- hdp_setdata(my_hdp, 4:13, example_data_hdp)
 my_hdp <- dp_activate(my_hdp, 1:13, 2)
 my_hdp_chain <- hdp_posterior(my_hdp, 100, 100, 10)
+
 }
 \seealso{
 \code{\link{hdp_multi_chain}}, \code{\link{hdp_extract_components}},

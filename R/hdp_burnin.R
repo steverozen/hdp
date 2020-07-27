@@ -4,7 +4,8 @@
 #' Each iteration re-assigns the cluster allocation of every data item.
 #'
 #' @param hdp An \code{\link[hdpx]{hdpState-class}} object or a list representation
-#'   of this.
+#'   of this. The list representation contains elements that correspond to
+#'   slots in an\code{\link[hdpx]{hdpState-class}} object.
 #'
 #' @param burnin The number of burn-in iterations.
 #'
