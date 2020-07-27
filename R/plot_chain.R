@@ -85,6 +85,13 @@ plot_data_assigned <- function(chain, legend=TRUE, col_early="hotpink",
   ccc <- clust_categ_counts(chain)
   numcluster <- numcluster(chain)
 
+  ## When all ccc have the same number of raw clusters, the function cannot work.
+  ## Mo added a bypass solution
+  if(sum(numcluster != numcluster[1])==0){
+    ccc[[1]] <- cbind(ccc[[1]],0)
+    numcluster <- unlist(lapply(ccc,function(x){return(ncol(x))}))
+  }
+
   # func to adjust length of a vector
   set.length <- function(vec, len){
     length(vec) <- len

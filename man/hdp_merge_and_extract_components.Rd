@@ -8,15 +8,16 @@ hdp_merge_and_extract_components(
   x,
   cluster.method = "kmedians",
   categ.CI = 0.95,
-  exposure.CI = 0.9,
+  exposure.CI = 0.95,
   cos.merge = 0.9,
-  min.sample = 1
+  min.sample = 1,
+  diagnostic.folder = NULL
 )
 }
 \arguments{
 \item{x}{hdpSampleChain or hdpSampleMulti object}
 
-\item{cluster.method}{a temporary argument}
+\item{cluster.method}{a temporary argument+}
 
 \item{categ.CI}{A numeric between 0 and 1. Level of confidence interval to be calculated for each category.
 Default is 0.95, but can be set to lower for extracting rare signatures}
@@ -28,6 +29,8 @@ Default is 0.95, but can be set to lower for extracting rare signatures}
 \item{cos.merge}{Merge components with cosine similarity above this threshold (default 0.90)}
 
 \item{min.sample}{Components must have significant exposure in at least this many samples (i.e. those DP nodes with data assigned) (default 1)}
+
+\item{diagnostic.folder}{If provided, details for hdp.0 is plotted}
 }
 \value{
 A hdpSampleChain or hdpSampleMulti object updated with component information

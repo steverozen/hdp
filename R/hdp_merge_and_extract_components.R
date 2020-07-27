@@ -12,8 +12,9 @@
 #' @param exposure.CI A numeric between 0 and 1. Level of confidence interval to be calculated
 #'                    for a sample's exposure/observation of a raw cluster/proto-signature.
 #'                    Default is 0.95, but can be set to lower for extracting rare signatures
-#' @param cluster.method  a temporary argument
-
+#' @param cluster.method  a temporary argument+
+#' @param diagnostic.folder If provided, details for hdp.0 is plotted
+#'
 #' @return A hdpSampleChain or hdpSampleMulti object updated with component information
 #' @aliases hdp_merge_and_extract_components
 #' @seealso \code{\link{hdp_posterior}}, \code{\link{hdp_multi_chain}},
@@ -21,17 +22,19 @@
 #'  \code{\link{plot_dp_comp_exposure}}
 #' @import clue
 #' @export
-
+# @examples
+# hdp_extract_components(mut_example_multi)
 hdp_merge_and_extract_components <- function(x,
                                              cluster.method = "kmedians",
                                              categ.CI    = 0.95,
-                                             exposure.CI = 0.90,
+                                             exposure.CI = 0.95,
                                              cos.merge   = 0.90,
-                                             min.sample  = 1){
+                                             min.sample  = 1,
+                                             diagnostic.folder=NULL){
 
   # input checks
   if (class(x)=="hdpSampleChain") {
-    warning('Extracting components on single posterior sampling chain. Recommend switching to multiple independent chains in a hdpSampleMulti object, see ?hdp_multi_chain')
+    message('Extracting components on single chain.A hdpSampleMulti object is recommended, see ?hdp_multi_chain')
     is_multi <- FALSE
   } else if (class(x)=="hdpSampleMulti") {
     is_multi <- TRUE
@@ -100,36 +103,43 @@ hdp_merge_and_extract_components <- function(x,
   #######################################
 
   ## At each sample point in the chain, merge clusters with cosine.similarity > 0.95
-  clust.number <- {}
+  first.merge <- function(ccc,cdc){
+    clust_label <- 1:ncol(ccc)
+
+    clust_cos <- lsa::cosine(ccc)
+    clust_same <- (clust_cos > 0.95 & lower.tri(clust_cos))
+    same <- which(clust_same, arr.ind=TRUE) # merge these columns
+    if (length(same)>0){
+      for (index in 1:nrow(same)){
+        clust_label[same[index, 1]] <- clust_label[same[index, 2]]
+      }
+    }
+
+    ccc <- merge_cols(ccc,clust_label)
+    cdc <- merge_cols(cdc,clust_label)
+    return(list(ccc=ccc,cdc=cdc))
+  }
+
 
   for(i in 1:length(ccc_0)){
-    ccc_temp <- ccc_0[[i]]
-    cdc_temp <- cdc_0[[i]]
 
-    for(j in 1:length(ccc_temp)){
+    len <- length(ccc_0[[i]])
 
-      clust_label <- 1:ncol(ccc_temp[[j]])
+    test <- mapply(first.merge,ccc_0[[i]],cdc_0[[i]])
 
-      clust_cos <- lsa::cosine(ccc_temp[[j]])
-      clust_same <- (clust_cos > 0.95 & lower.tri(clust_cos))
-      same <- which(clust_same, arr.ind=TRUE) # merge these columns
-      if (length(same)>0){
-        for (index in 1:nrow(same)){
-          clust_label[same[index, 1]] <- clust_label[same[index, 2]]
-        }
-      }
-
-      ccc_temp[[j]] <- merge_cols(ccc_temp[[j]],clust_label)
-      cdc_temp[[j]] <- merge_cols(cdc_temp[[j]],clust_label)
-      clust.number <- c(clust.number,ncol(ccc_temp[[j]]))
+    for(j in 1:len){
+      ccc_0[[i]][[j]] <- test[[(2*j)-1]]
+      cdc_0[[i]][[j]] <- test[[2*j]]
     }
-    ccc_0[[i]] <- ccc_temp
-    cdc_0[[i]] <- cdc_temp
+
+
 
   }
 
   ##every ccc and cdc has the same number of columns
-  maxclust <- max(clust.number)
+  maxclust <- max(unlist((lapply(ccc_0, function(ccc){
+    max(unlist(lapply(ccc,function(x)ncol(x))))
+  } ))))
 
   for(i in 1:length(ccc_0)){
     ccc_temp <- ccc_0[[i]]
@@ -144,8 +154,6 @@ hdp_merge_and_extract_components <- function(x,
     cdc_0[[i]] <- cdc_temp
 
   }
-
-
   ###############################################################
 
   # if priors, #remove pseudo-counts from ccc_0
@@ -271,6 +279,37 @@ hdp_merge_and_extract_components <- function(x,
   clust_label <- colnames(ccc_3[[1]])
   if (any(clust_label != colnames(cdc_3))) stop("problem in step 3!")
 
+  ##more steps of doing merging. Some merged raw clusters have high cos sim
+  for(iter.index in 1:10){
+
+    avgdistn <- matrix(0, nrow=ncat, ncol=ncol(ccc_3[[1]]))
+    for (i in 1:ncol(ccc_3[[1]])){
+      distns <- sapply(ccc_3, function(x) x[, i]/sum(x[, i]))
+      avgdistn[, i] <- rowMeans(distns, na.rm=T)
+    }
+    clust_cos <- lsa::cosine(avgdistn)
+    clust_same <- (clust_cos > cos.merge & lower.tri(clust_cos))
+    same <- which(clust_same, arr.ind=TRUE) # merge these columns
+    if(length(same)==0){
+      message("no more merging")
+      break
+    }else{
+      message("extra merging")
+      for (i in 1:nrow(same)){
+        clust_label[same[i, 1]] <- clust_label[same[i, 2]]
+      }
+      #remove(i)
+      avgdistn_ccc3 <- merge_cols(avgdistn,clust_label)
+      ccc_3 <- lapply(ccc_3, merge_cols, clust_label)
+      cdc_3 <- lapply(cdc_3, merge_cols, clust_label)
+      clust_label <- colnames(ccc_3[[1]])
+      if (any(clust_label != colnames(cdc_3))) stop("problem in step 3!")
+    }
+    # update clust_label vector to reflect the merging of columns.
+
+  }
+
+
   remove(avgdistn, distns, clust_cos, clust_same, same, ccc_2, cdc_2)
 
 
@@ -303,9 +342,24 @@ hdp_merge_and_extract_components <- function(x,
 
   # update clust_label vector
   clust_label[which(!clust_label %in% use_clust)] <- '0'
+
   ccc_4 <- lapply(ccc_3, merge_cols, clust_label)
 
   cdc_4 <- lapply(cdc_3, merge_cols, clust_label)
+
+  # Change from NR code: back pointers to the constuents
+  # ccc_4 element.
+  avgdistn_ccc4 <- matrix(0, nrow=ncat, ncol=ncol(ccc_4[[1]]))
+
+  for (i in 1:ncol(ccc_4[[1]])){
+    distns <- sapply(ccc_4, function(x) x[, i])
+    avgdistn_ccc4[, i] <- rowSums(distns, na.rm=T)
+  }
+  colnames(avgdistn_ccc4) <- colnames(cdc_4[[1]])
+  clust_label <- colnames(cdc_4[[1]])
+
+  if (any(clust_label != colnames(cdc_4))) stop("problem in step 4!")
+
 
   # if there was no component zero added, add an empty one now
   if (!"0" %in% clust_label) {
@@ -324,17 +378,47 @@ hdp_merge_and_extract_components <- function(x,
 
   }
 
-  # Change from NR code: back pointers to the constuents
-  # ccc_4 element.
-  avgdistn_ccc4 <- matrix(0, nrow=ncat, ncol=ncol(ccc_4[[1]]))
+  ##Added by Mo: create diagnostic plot to trace back hdp.0
 
-  for (i in 1:ncol(ccc_4[[1]])){
-    distns <- sapply(ccc_4, function(x) x[, i]/sum(x[, i]))
-    avgdistn_ccc4[, i] <- rowMeans(distns, na.rm=T)
+  if(!is.null(diagnostic.folder)){
+    if (dir.exists(diagnostic.folder)) {
+      message(diagnostic.folder, " already exits")
+    } else {
+      dir.create(diagnostic.folder, recursive = T)
+    }
+
+    ##plot1
+
+    row.names(avgdistn_ccc4) <- ICAMS::catalog.row.order$SBS96
+    avgdistn_ccc4_catalog <- ICAMS::as.catalog(avgdistn_ccc4,catalog.type = "counts")
+    ICAMS::PlotCatalogToPdf(avgdistn_ccc4_catalog,
+                            file.path(diagnostic.folder, "aggregated.spectrum.after.step4.pdf"))
+
+
+    if(ncol(clust_hdp0_ccc4)>0){
+
+      ##plot2
+
+      row.names(clust_hdp0_ccc4) <- ICAMS::catalog.row.order$SBS96
+      clust_hdp0_ccc4_catalog <- ICAMS::as.catalog(clust_hdp0_ccc4,catalog.type = "counts")
+      ICAMS::PlotCatalogToPdf(clust_hdp0_ccc4_catalog,
+                              file.path(diagnostic.folder, "aggregated.spectrum.moved.to.hdp0.in.step4.pdf"))
+
+      ##plot3 each cluster in clust_hdp0_ccc4 has a new folder
+
+
+      diagnostic_in_extraction(clust_hdp0_ccc = clust_hdp0_ccc4,
+                               nsamp          = nsamp,
+                               ncat           = ncat,
+                               nch            = nch,
+                               ccc            = ccc_3,
+                               cdc            = cdc_3,
+                               diagnostic.folder = diagnostic.folder)
+
+
+    }
   }
 
-  clust_label <- colnames(cdc_4[[1]])
-  if (any(clust_label != colnames(cdc_4))) stop("problem in step 4!")
 
   remove(compii, ccc_3, cdc_3, ii, lowerb, use_clust)
 
@@ -376,6 +460,48 @@ hdp_merge_and_extract_components <- function(x,
   cdc_5 <- lapply(cdc_4, merge_cols, clust_label)
   clust_label <- colnames(ccc_5[[1]])
   if (any(clust_label != colnames(cdc_5))) stop("problem in step 5!")
+
+
+  ##Added by Mo: create diagnostic plot to trace back hdp.0
+
+  if(!is.null(diagnostic.folder)){
+    if (dir.exists(diagnostic.folder)) {
+      message(diagnostic.folder, " already exits")
+    } else {
+      dir.create(diagnostic.folder, recursive = T)
+    }
+
+    ##plot1
+
+    row.names(avgdistn_ccc4) <- ICAMS::catalog.row.order$SBS96
+    avgdistn_ccc4_catalog <- ICAMS::as.catalog(avgdistn_ccc4,catalog.type = "counts")
+    ICAMS::PlotCatalogToPdf(avgdistn_ccc4_catalog,file.path(diagnostic.folder, "aggregated.spectrum.after.step5.pdf"))
+
+
+    if(ncol(clust_hdp0_ccc5)>0){
+
+      ##plot2
+
+      row.names(clust_hdp0_ccc5) <- ICAMS::catalog.row.order$SBS96
+      clust_hdp0_ccc5_catalog <- ICAMS::as.catalog(clust_hdp0_ccc5,catalog.type = "counts")
+      ICAMS::PlotCatalogToPdf(clust_hdp0_ccc5_catalog,
+                              file.path(diagnostic.folder, "aggregated.spectrum.moved.to.hdp0.in.step5.pdf"))
+
+      ##plot3 each cluster in clust_hdp0_ccc4 has a new folder
+
+
+      diagnostic_in_extraction(clust_hdp0_ccc = clust_hdp0_ccc5,
+                               nsamp          = nsamp,
+                               ncat           = ncat,
+                               nch            = nch,
+                               ccc            = ccc_4,
+                               cdc            = cdc_4,
+                               diagnostic.folder = diagnostic.folder)
+    }
+  }
+
+
+
 
   remove(compii, ccc_4, cdc_4, ii, lowerb, use_clust, disregard)
 
