@@ -18,13 +18,18 @@
 #'  random seed from 1 -- 10^7, reported in the output.
 #' @param verbosity Verbosity of debugging statements.
 #'  0 (least verbose) -- 4 (most verbose). 0 highly recommended - only change for debugging small examples.
+#'
 #' @return A hdpSampleChain object with the salient information from each
 #'  posterior sample. See \code{\link{hdpSampleChain-class}}
+#'
 #' @seealso \code{\link{hdp_multi_chain}}, \code{\link{hdp_extract_components}},
 #'  \code{\link{cull_posterior_samples}}, \code{\link{plot_lik}}, \code{\link{plot_numcluster}},
 #'  \code{\link{plot_data_assigned}}
+#'
 #' @importClassesFrom Matrix dgCMatrix
+#'
 #' @export
+#'
 #' @examples
 #' my_hdp <- hdp_init(ppindex=0, cpindex=1, hh=rep(1, 6), alphaa=rep(1, 3), alphab=rep(2, 3))
 #' my_hdp <- hdp_adddp(my_hdp, 2, 1, 2)
@@ -32,6 +37,7 @@
 #' my_hdp <- hdp_setdata(my_hdp, 4:13, example_data_hdp)
 #' my_hdp <- dp_activate(my_hdp, 1:13, 2)
 #' my_hdp_chain <- hdp_posterior(my_hdp, 100, 100, 10)
+#'
 hdp_posterior <- function(hdp, burnin, n, space, cpiter=1,
                           seed=sample(1:10^7, 1), verbosity=0){
 
