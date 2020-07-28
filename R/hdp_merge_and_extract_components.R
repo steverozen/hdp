@@ -12,7 +12,6 @@
 #' @param exposure.CI A numeric between 0 and 1. Level of confidence interval to be calculated
 #'                    for a sample's exposure/observation of a raw cluster/proto-signature.
 #'                    Default is 0.95, but can be set to lower for extracting rare signatures
-#' @param cluster.method  a temporary argument+
 #' @param diagnostic.folder If provided, details for hdp.0 is plotted
 #'
 #' @return A hdpSampleChain or hdpSampleMulti object updated with component information
@@ -25,7 +24,6 @@
 # @examples
 # hdp_extract_components(mut_example_multi)
 hdp_merge_and_extract_components <- function(x,
-                                             cluster.method = "kmedians",
                                              categ.CI    = 0.95,
                                              exposure.CI = 0.95,
                                              cos.merge   = 0.90,
@@ -81,115 +79,151 @@ hdp_merge_and_extract_components <- function(x,
   # Make each ccc (clust_categ_counts) and
   # cdc (clust_dp_counts) matrix have the
   # same number of columns
-
-  ccc_0 <- lapply(chlist, function(ch){
-    lapply(clust_categ_counts(ch), function(x){
-      ans <- cbind(x)
-      return(ans[, -ncol(ans)])
+  if(is_multi){
+    ccc_0 <- lapply(chlist, function(ch){
+      lapply(clust_categ_counts(ch), function(x){
+        ans <- cbind(x)
+        return(ans[, -ncol(ans)])
+      })
     })
-  })
 
 
-  cdc_0 <- lapply(chlist, function(ch){
-    lapply(clust_dp_counts(ch), function(x){
-      ans <- cbind(x)
-      return(ans[, -ncol(ans)])
+    cdc_0 <- lapply(chlist, function(ch){
+      lapply(clust_dp_counts(ch), function(x){
+        ans <- cbind(x)
+        return(ans[, -ncol(ans)])
+      })
     })
-  })
+
+    # if priors, remove pseudo-counts from ccc_0
+    if (is_prior){
+      pseudodata <- sapply(dp(final_hdpState(chlist[[1]]))[pseudo],
+                           function(x) table(factor(x@datass, levels=1:ncat)))
+
+      ccc_0 <- lapply(ccc_0, function(y) lapply(y, function(x) {
+        x[,priorcc] <- x[,priorcc] - pseudodata
+        return(x)
+      }))
+    }
 
 
+    #######################################
 
+    ## At each sample point in the chain, merge clusters with cosine.similarity > 0.95
+    first.merge <- function(ccc,cdc){
+      clust_label <- 1:ncol(ccc)
 
-  #######################################
-
-  ## At each sample point in the chain, merge clusters with cosine.similarity > 0.95
-  first.merge <- function(ccc,cdc){
-    clust_label <- 1:ncol(ccc)
-
-    clust_cos <- lsa::cosine(ccc)
-    clust_same <- (clust_cos > 0.95 & lower.tri(clust_cos))
-    same <- which(clust_same, arr.ind=TRUE) # merge these columns
-    if (length(same)>0){
-      for (index in 1:nrow(same)){
-        clust_label[same[index, 1]] <- clust_label[same[index, 2]]
+      clust_cos <- lsa::cosine(ccc)
+      clust_same <- (clust_cos > 0.95 & lower.tri(clust_cos))
+      same <- which(clust_same, arr.ind=TRUE) # merge these columns
+      if (length(same)>0){
+        for (index in 1:nrow(same)){
+          clust_label[same[index, 1]] <- clust_label[same[index, 2]]
+        }
       }
-    }
 
-    ccc <- merge_cols(ccc,clust_label)
-    cdc <- merge_cols(cdc,clust_label)
-    return(list(ccc=ccc,cdc=cdc))
-  }
-
-
-  for(i in 1:length(ccc_0)){
-
-    len <- length(ccc_0[[i]])
-
-    test <- mapply(first.merge,ccc_0[[i]],cdc_0[[i]])
-
-    for(j in 1:len){
-      ccc_0[[i]][[j]] <- test[[(2*j)-1]]
-      cdc_0[[i]][[j]] <- test[[2*j]]
+      ccc <- merge_cols(ccc,clust_label)
+      cdc <- merge_cols(cdc,clust_label)
+      return(list(ccc=ccc,cdc=cdc))
     }
 
 
+    for(i in 1:length(ccc_0)){
 
-  }
+      len <- length(ccc_0[[i]])
 
-  ##every ccc and cdc has the same number of columns
-  maxclust <- max(unlist((lapply(ccc_0, function(ccc){
-    max(unlist(lapply(ccc,function(x)ncol(x))))
-  } ))))
+      test <- mapply(first.merge,ccc_0[[i]],cdc_0[[i]])
 
-  for(i in 1:length(ccc_0)){
-    ccc_temp <- ccc_0[[i]]
-    cdc_temp <- cdc_0[[i]]
+      for(j in 1:len){
+        ccc_0[[i]][[j]] <- test[[(2*j)-1]]
+        cdc_0[[i]][[j]] <- test[[2*j]]
+      }
 
-    for(j in 1:length(ccc_temp)){
 
-      ccc_temp[[j]] <- cbind(ccc_temp[[j]],matrix(0, nrow=ncat, ncol=(maxclust-ncol(ccc_temp[[j]])+1)) )
-      cdc_temp[[j]] <- cbind(cdc_temp[[j]],matrix(0, nrow=ndp, ncol=(maxclust-ncol(cdc_temp[[j]])+1)) )
+
     }
-    ccc_0[[i]] <- ccc_temp
-    cdc_0[[i]] <- cdc_temp
 
-  }
-  ###############################################################
+    ##every ccc and cdc has the same number of columns
+    maxclust <- max(unlist((lapply(ccc_0, function(ccc){
+      max(unlist(lapply(ccc,function(x)ncol(x))))
+    } ))))
 
-  # if priors, #remove pseudo-counts from ccc_0
+    for(i in 1:length(ccc_0)){
+      ccc_temp <- ccc_0[[i]]
+      cdc_temp <- cdc_0[[i]]
 
-  ccc_raw_avg_per_ch <- lapply(ccc_0, function(matlist){ Reduce('+', matlist)/length(matlist) })
+      for(j in 1:length(ccc_temp)){
 
-  mclust <- ncol(ccc_raw_avg_per_ch[[1]])
+        ccc_temp[[j]] <- cbind(ccc_temp[[j]],matrix(0, nrow=ncat, ncol=(maxclust-ncol(ccc_temp[[j]])+1)) )
+        cdc_temp[[j]] <- cbind(cdc_temp[[j]],matrix(0, nrow=ndp, ncol=(maxclust-ncol(cdc_temp[[j]])+1)) )
+      }
+      ccc_0[[i]] <- ccc_temp
+      cdc_0[[i]] <- cdc_temp
 
-  rapch_unlist <- t(do.call(cbind, ccc_raw_avg_per_ch))
-  rapch_gf <- rep(1:nch, each=mclust)
-  rapch_ic <- rep(1:mclust, times=nch)
-  ###re-indexing
-  rapch_clust <- flexclust::kcca(rapch_unlist, k=rapch_ic,
-                                 group=rapch_gf,
-                                 family=flexclust::kccaFamily(cluster.method,
-                                                              groupFun="differentClusters"))
+    }
+    ###############################################################
 
-  rapch_label <- split(flexclust::clusters(rapch_clust), rapch_gf)
+    # if priors, #remove pseudo-counts from ccc_0
 
-  ccc_1 <- Reduce('c', mapply(function(matlist, rank){
-    lapply(matlist, function(mat){
-      ans <- mat[,order(rank)]
-      return(ans)
+    ccc_raw_avg_per_ch <- lapply(ccc_0, function(matlist){ Reduce('+', matlist)/length(matlist) })
+
+    mclust <- ncol(ccc_raw_avg_per_ch[[1]])
+
+    rapch_unlist <- t(do.call(cbind, ccc_raw_avg_per_ch))
+    rapch_gf <- rep(1:nch, each=mclust)
+    rapch_ic <- rep(1:mclust, times=nch)
+    ###re-indexing
+    rapch_clust <- flexclust::kcca(rapch_unlist, k=rapch_ic,
+                                   group=rapch_gf,
+                                   family=flexclust::kccaFamily("kmedians",
+                                                                groupFun="differentClusters"))
+
+    rapch_label <- split(flexclust::clusters(rapch_clust), rapch_gf)
+
+    ccc_1 <- Reduce('c', mapply(function(matlist, rank){
+      lapply(matlist, function(mat){
+        ans <- mat[,order(rank)]
+        return(ans)
+      })
+    }, ccc_0, rapch_label, SIMPLIFY=FALSE))
+
+    cdc_1 <- Reduce('c', mapply(function(matlist, rank){
+      lapply(matlist, function(mat){
+        ans <- mat[,order(rank)]
+        return(ans)
+      })
+    }, cdc_0, rapch_label, SIMPLIFY=FALSE))
+
+    remove(ccc_0, cdc_0, ccc_raw_avg_per_ch, rapch_unlist, rapch_gf, rapch_ic,
+           rapch_clust, rapch_label, mclust)
+
+  } else {
+
+    maxclust <- max(numcluster(x))
+    clust_label <- 1:maxclust
+
+    ccc_1 <- lapply(clust_categ_counts(x), function(x){
+      ans <- cbind(x, matrix(0, nrow=ncat, ncol=(maxclust-ncol(x)+1)))
+      return(ans[, -ncol(ans)])
     })
-  }, ccc_0, rapch_label, SIMPLIFY=FALSE))
 
-  cdc_1 <- Reduce('c', mapply(function(matlist, rank){
-    lapply(matlist, function(mat){
-      ans <- mat[,order(rank)]
-      return(ans)
+    cdc_1 <- lapply(clust_dp_counts(x), function(x){
+      ans <- cbind(x, matrix(0, nrow=ndp, ncol=(maxclust-ncol(x)+1)))
+      return(ans[, -ncol(ans)])
     })
-  }, cdc_0, rapch_label, SIMPLIFY=FALSE))
 
-  remove(ccc_0, cdc_0, ccc_raw_avg_per_ch, rapch_unlist, rapch_gf, rapch_ic,
-         rapch_clust, rapch_label, mclust)
+    # if priors, remove pseudo-counts from ccc_1
+    if (is_prior){
+      pseudodata <- sapply(dp(final_hdpState(x))[pseudo],
+                           function(x) table(factor(x@datass, levels=1:ncat)))
 
+      ccc_1 <- lapply(ccc_1, function(x) {
+        x[,priorcc] <- x[,priorcc] - pseudodata
+        return(x)
+      })
+    }
+
+  }
 
 
   # Step (2)
@@ -224,7 +258,7 @@ hdp_merge_and_extract_components <- function(x,
 
     ccc_clust <- flexclust::kcca(ccc_unlist, k=initial_clust,
                                  group=groupfactor,
-                                 family=flexclust::kccaFamily(cluster.method,
+                                 family=flexclust::kccaFamily("kmedians",
 
                                                               groupFun="differentClusters"))
 
@@ -515,6 +549,51 @@ hdp_merge_and_extract_components <- function(x,
 
   # If priors,
   # update clust_label to reflect match (down to 0.9) with prior components
+  if (is_prior) {
+
+    nco <- length(clust_label)
+
+    # average distribution over data categ for each component
+    avgdistn <- sapply(2:nco, function(i){
+      distns <- sapply(ccc_5, function(x) x[, i]/sum(x[, i]))
+      ans <- rowMeans(distns, na.rm=T)
+      return(ans)
+    })
+
+    # compare against original pseudodata distn
+    match2_pseudo <- apply(avgdistn, 2, function(x) lsa::cosine(x, pseudodata))
+    rownames(match2_pseudo) <- priorcc
+    colnames(match2_pseudo) <- clust_label[-1]
+
+    to_match <- TRUE
+    while(to_match){
+      if(!any(match2_pseudo>0.9)) {
+        to_match <- FALSE
+        break
+      }
+
+      best_match <- which(match2_pseudo==max(match2_pseudo), arr.ind = TRUE)
+      old <- colnames(match2_pseudo)[best_match[2]]
+      new <- paste0("P", rownames(match2_pseudo)[best_match[1]])
+      clust_label[which(clust_label == old)] <- new
+
+      match2_pseudo <- match2_pseudo[-best_match[1], -best_match[2], drop=FALSE]
+
+    }
+    suppressWarnings(rm(to_match, match2_pseudo, avgdistn, best_match, old, new, nco))
+
+    ccc_5 <- lapply(ccc_5, function(x) {
+      colnames(x) <- clust_label
+      return(x)
+    })
+
+    cdc_5 <- lapply(cdc_5, function(x) {
+      colnames(x) <- clust_label
+      return(x)
+    })
+
+  }
+
 
 
   ccc_6 <- lapply(ccc_5, function(x) {

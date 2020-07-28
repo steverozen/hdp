@@ -13,7 +13,6 @@ test_that("hdp_merge_and_extract_components", {
   retvalx <- hdp_merge_and_extract_components(x = x,
                                               categ.CI = 0.95,
                                               exposure.CI = 0.95,
-                                              cluster.method = "kmedians",
                                               cos.merge = 0.90,
                                               min.sample = 1)
 

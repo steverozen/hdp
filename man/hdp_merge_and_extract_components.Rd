@@ -6,7 +6,6 @@
 \usage{
 hdp_merge_and_extract_components(
   x,
-  cluster.method = "kmedians",
   categ.CI = 0.95,
   exposure.CI = 0.95,
   cos.merge = 0.9,
@@ -16,8 +15,6 @@ hdp_merge_and_extract_components(
 }
 \arguments{
 \item{x}{hdpSampleChain or hdpSampleMulti object}
-
-\item{cluster.method}{a temporary argument+}
 
 \item{categ.CI}{A numeric between 0 and 1. Level of confidence interval to be calculated for each category.
 Default is 0.95, but can be set to lower for extracting rare signatures}
