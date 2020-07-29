@@ -27,7 +27,7 @@
 #'
 #' @export
 #'
-#' @examples
+
 
 hdp_burnin <- function(hdp,
                        burnin,
