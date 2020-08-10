@@ -46,10 +46,18 @@ setClass("hdpConparam",
            totalnt = "integer"),
          validity = function(object){
            is_valid <- TRUE
-           if (is.any.slot.negative(object)) {
-             is_valid <- FALSE
-             message("hdpConparam must not contain negative values")
+
+
+          if (is.any.slot.negative(object)) {
+            ##walkaround for piror by Mo##
+            #is_valid <- FALSE
+            ##end
+             warning("hdpConparam must not contain negative values")
            }
+
+           ##comment end by Mo####
+
+
            if (length(object@totalnd) != object@numdp |
                  length(object@totalnt) != object@numdp) {
              is_valid <- FALSE
@@ -84,8 +92,10 @@ setClass("hdpDP",
          validity = function(object){
            is_valid <- TRUE
            if (is.any.slot.negative(object)) {
-             is_valid <- FALSE
-             message("hdpDP must not contain negative values")
+             ##walkaround for piror by Mo##
+             #is_valid <- FALSE
+             ##end
+             warning("hdpDP must not contain negative values")
            }
            if (length(object@datass) != object@numdata |
                  length(object@datacc) > 0 &
@@ -129,13 +139,14 @@ setClass("hdpState",
            pseudoDP = "integer"),
          validity = function(object){
            is_valid <- TRUE
-           ##commented by Mo. This affects prior.signature running
-           ##but I don't know why
-           #if (is.any.slot.negative(object)) {
-          ##is_valid <- FALSE
-            # message("hdpState must not contain negative values")
-           #}
-           ##commented end by Mo
+           if (is.any.slot.negative(object)) {
+             ##comment out by Mo. Walk around for prior signature
+             ##I don't know why
+             #is_valid <- FALSE
+             ##commented end by Mo
+             warning("hdpState must not contain negative values")
+           }
+
            if (!validObject(object@base)) {
              is_valid <- FALSE
              message("base not valid")
