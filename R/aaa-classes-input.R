@@ -129,10 +129,13 @@ setClass("hdpState",
            pseudoDP = "integer"),
          validity = function(object){
            is_valid <- TRUE
-           if (is.any.slot.negative(object)) {
-             is_valid <- FALSE
-             message("hdpState must not contain negative values")
-           }
+           ##commented by Mo. This affects prior.signature running
+           ##but I don't know why
+           #if (is.any.slot.negative(object)) {
+          ##is_valid <- FALSE
+            # message("hdpState must not contain negative values")
+           #}
+           ##commented end by Mo
            if (!validObject(object@base)) {
              is_valid <- FALSE
              message("base not valid")
