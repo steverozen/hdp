@@ -394,7 +394,7 @@ plot_dp_comp_exposure <- function(hdpsample, dpindices, col_comp, dpnames=NULL,
 #' @rdname plotcomp
 #'
 plot_chain_hdpsig_exp <- function(hdpsample, chains,
-                           legend=TRUE){
+                                  legend=TRUE){
 
   chain <- sum.exposure <- NULL
   # input checks
@@ -421,11 +421,12 @@ plot_chain_hdpsig_exp <- function(hdpsample, chains,
   colnames(sums.melt) <- c("Comp","no.post.samp","sum.exposure")
 
 
- ##Plot overall exposures
+  ##Plot overall exposures
   plot(x=jitter(rep(0:(nrow(sums)-1), ncol(sums))), xlab="Component",
        xaxt="n", y=as.vector(sums), pch=1, col=comp.cols, ylab="Number of data items")
   axis(1, at=0:(nrow(sums)-1), labels=rownames(sums))
- ##plot exposures for each hdp signature
+  ##plot exposures for each hdp signature
+
   for(comp in unique(sums.melt$Comp)){
 
     temp.sums.melt <- sums.melt[sums.melt$Comp==comp,]
@@ -437,6 +438,7 @@ plot_chain_hdpsig_exp <- function(hdpsample, chains,
       ggplot2::geom_boxplot()+
       ggplot2::scale_fill_manual(values=chains.cols)+
       ggplot2::ggtitle(paste0("hdp.",comp," exposure"))+
+
       ggplot2::xlab("Posterior chain") +
       ggplot2::ylab("Exposure of all tumors")
     plot(plot.2)
