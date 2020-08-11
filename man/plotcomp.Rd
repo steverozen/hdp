@@ -5,6 +5,7 @@
 \alias{plot_comp_size}
 \alias{plot_comp_distn}
 \alias{plot_dp_comp_exposure}
+\alias{plot_chain_hdpsig_exp}
 \title{Plot extracted components}
 \usage{
 plot_comp_size(
@@ -51,6 +52,8 @@ plot_dp_comp_exposure(
   oma = c(1.5, 1.5, 1, 1),
   ...
 )
+
+plot_chain_hdpsig_exp(hdpsample, chains, legend = TRUE)
 }
 \arguments{
 \item{hdpsample}{A hdpSampleChain or hdpSampleMulti object including output
@@ -124,7 +127,11 @@ be included (per DP)? (Default TRUE)}
 \item{mar}{See ?par}
 
 \item{oma}{See ?par}
+
+\item{chains}{A hdpSampleChain or hdpSampleMulti object in the list representation}
 }
 \description{
+Plot extracted components
+
 Plot extracted components
 }

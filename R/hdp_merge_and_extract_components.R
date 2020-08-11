@@ -428,10 +428,8 @@ hdp_merge_and_extract_components <- function(x,
     ICAMS::PlotCatalogToPdf(avgdistn_ccc4_catalog,
                             file.path(diagnostic.folder, "aggregated.spectrum.after.step4.pdf"))
 
-    clust_hdp0_ccc4 <- clust_hdp0_ccc4[,colSums(clust_hdp0_ccc4)>0]
 
-
-    if(ncol(clust_hdp0_ccc4)>0){
+    if(ncol(clust_hdp0_ccc4)>0&&!is.null(ncol(clust_hdp0_ccc4))){
 
       ##plot2
 
@@ -513,10 +511,7 @@ hdp_merge_and_extract_components <- function(x,
     avgdistn_ccc4_catalog <- ICAMS::as.catalog(avgdistn_ccc4,catalog.type = "counts")
     ICAMS::PlotCatalogToPdf(avgdistn_ccc4_catalog,file.path(diagnostic.folder, "aggregated.spectrum.after.step5.pdf"))
 
-    clust_hdp0_ccc5 <- clust_hdp0_ccc5[,colSums(clust_hdp0_ccc5)>0]
-
-
-    if(ncol(clust_hdp0_ccc5)>0){
+    if(ncol(clust_hdp0_ccc5)>0&&!is.null(ncol(clust_hdp0_ccc5))){
 
       ##plot2
 

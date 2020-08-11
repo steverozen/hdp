@@ -16,7 +16,8 @@ Imports:
     clue,
     Matrix,
     ggplot2,
-    ICAMS
+    ICAMS,
+    data.table
 LazyData: true
 Description: Model categorical count data with a hierarchical Dirichlet
     Process. Includes functions to initialise a HDP with a custom tree

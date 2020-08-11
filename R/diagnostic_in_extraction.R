@@ -27,7 +27,7 @@ diagnostic_in_extraction <- function(clust_hdp0_ccc,
 
   chain <- exposures <- nsampchain <- NULL
 
-  nsampchain <- nsamp/ncat
+  nsampchain <- nsamp/nch
   for(i in 1:ncol(clust_hdp0_ccc)){
     summary.matrix <- data.frame(colnames(clust_hdp0_ccc))
     cluster.pattern <- clust_hdp0_ccc[,i]
@@ -73,26 +73,25 @@ diagnostic_in_extraction <- function(clust_hdp0_ccc,
 
     }
 
-  }
+    dir.create(file.path(diagnostic.folder,cluster.name), recursive = T)
 
-  dir.create(file.path(diagnostic.folder,cluster.name), recursive = T)
-
-  if(ncol(individual.catalog)>0){
     row.names(individual.catalog) <- ICAMS::catalog.row.order$SBS96
     individual.catalog.catalog <- ICAMS::as.catalog(individual.catalog,catalog.type = "counts")
     ICAMS::PlotCatalogToPdf(individual.catalog.catalog,
                             file.path(diagnostic.folder,cluster.name,"/individual.raw.cluster.pdf"))
+
+    grDevices::pdf(file.path(diagnostic.folder,cluster.name,"/cluster.in.Gibbs.sample.pdf"))
+    plot.1 <- ggplot2::ggplot(data=summary.cluster, ggplot2::aes(x=sample, y=sequence, group=chain,color=chain)) +
+      ggplot2::geom_point()+ggplot2::ggtitle(paste0(cluster.name," in Gibbs sample")) + ggplot2::xlab("Posterior.Sample") +  ggplot2::ylab("Chain")
+    plot(plot.1)
+    grDevices::dev.off()
+
+    grDevices::pdf(file.path(diagnostic.folder,cluster.name,"/cluster.exposure.in.Gibbs.sample.pdf"))
+    plot.2 <- ggplot2::ggplot(data=summary.cluster, ggplot2::aes(x=sample, y=exposures, group=chain,color=chain)) +
+      ggplot2::geom_point()+ggplot2::ggtitle(paste0("exposures of ",cluster.name," in Gibbs sample"))+ ggplot2::xlab("Posterior.Sample") +  ggplot2::ylab("Exposure")
+    plot(plot.2)
+    grDevices::dev.off()
+
   }
 
-  grDevices::pdf(file.path(diagnostic.folder,cluster.name,"/cluster.in.Gibbs.sample.pdf"))
-  plot.1 <- ggplot2::ggplot(data=summary.cluster, ggplot2::aes(x=sample, y=sequence, group=chain,color=chain)) +
-    ggplot2::geom_point()+ggplot2::ggtitle(paste0(cluster.name," in Gibbs sample")) + ggplot2::xlab("Posterior.Sample") +  ggplot2::ylab("Chain")
-  plot(plot.1)
-  grDevices::dev.off()
-
-  grDevices::pdf(file.path(diagnostic.folder,cluster.name,"/cluster.exposure.in.Gibbs.sample.pdf"))
-  plot.2 <- ggplot2::ggplot(data=summary.cluster, ggplot2::aes(x=sample, y=exposures, group=chain,color=chain)) +
-    ggplot2::geom_point()+ggplot2::ggtitle(paste0("exposures of ",cluster.name," in Gibbs sample"))+ ggplot2::xlab("Posterior.Sample") +  ggplot2::ylab("Exposure")
-  plot(plot.2)
-  grDevices::dev.off()
 }

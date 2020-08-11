@@ -49,7 +49,7 @@ plot_comp_size <- function(hdpsample, legend=TRUE, col_a="hotpink",
   if(class(legend) != "logical") stop("legend must be TRUE or FALSE")
 
 
-  sums <- t(sapply(comp_categ_counts(hdpsample), rowSums))
+  sums <- t(sapply(comp_categ_counts(hdpsample), rowSums)) ##sums of exposures for each signature across all posterior samples
 
   # colour ramp across posterior samples
   cols <- colorRampPalette(colors=c(col_a, col_b))
@@ -117,17 +117,17 @@ plot_comp_distn <- function(hdpsample, comp=NULL, cat_names=NULL,
   ncomp <- nrow(comp_distn$mean)-1
   if (class(comp) != "NULL") {
     if ( !is.numeric(comp) | any(comp %% 1 != 0) |
-          any(comp < 0) | any(comp > ncomp)) {
+         any(comp < 0) | any(comp > ncomp)) {
       stop(paste("comp must be integer between 0 and", ncomp))
     }
   }
   if (!class(cat_names) %in% c("character", "NULL") |
-       !length(cat_names) %in% c(ncat, 0)) {
+      !length(cat_names) %in% c(ncat, 0)) {
     stop("cat_names must be a character vector with one value for every
          data category, or NULL")
   }
   if (!class(grouping) %in% c("factor", "NULL") |
-        !length(grouping) %in% c(ncat, 0)) {
+      !length(grouping) %in% c(ncat, 0)) {
     stop("grouping must be a factor with one value for every
          data category, or NULL")
   }
@@ -136,7 +136,7 @@ plot_comp_distn <- function(hdpsample, comp=NULL, cat_names=NULL,
   }
   if(class(cred_int) != "logical") stop("cred_int must be TRUE or FALSE")
   if(!class(weights) %in% c("numeric", "NULL") |
-       !length(weights) %in% c(ncat, 0)) {
+     !length(weights) %in% c(ncat, 0)) {
     stop("weights must be a numeric vector with one value for every
          data category, or NULL")
   }
@@ -149,7 +149,7 @@ plot_comp_distn <- function(hdpsample, comp=NULL, cat_names=NULL,
   }
 
   if(!class(plot_title) %in% c("character", "NULL") |
-       !length(plot_title) %in% c(length(comp_to_plot), 0)){
+     !length(plot_title) %in% c(length(comp_to_plot), 0)){
     stop("plot_title must be a character vector with one value for every
          component being plotted, or NULL")
   }
@@ -248,13 +248,13 @@ plot_comp_distn <- function(hdpsample, comp=NULL, cat_names=NULL,
 #' @export
 #' @rdname plotcomp
 plot_dp_comp_exposure <- function(hdpsample, dpindices, col_comp, dpnames=NULL,
-                                main_text=NULL, incl_numdata_plot=TRUE,
-                                incl_nonsig=TRUE, incl_comp0=TRUE,
-                                ylab_numdata="Number of data items",
-                                ylab_exp="Component exposure",
-                                leg.title="Component", cex.names=0.6,
-                                cex.axis=0.7, mar=c(1, 4, 2, 0.5),
-                                oma=c(1.5, 1.5, 1, 1), ...){
+                                  main_text=NULL, incl_numdata_plot=TRUE,
+                                  incl_nonsig=TRUE, incl_comp0=TRUE,
+                                  ylab_numdata="Number of data items",
+                                  ylab_exp="Component exposure",
+                                  leg.title="Component", cex.names=0.6,
+                                  cex.axis=0.7, mar=c(1, 4, 2, 0.5),
+                                  oma=c(1.5, 1.5, 1, 1), ...){
 
   # input checks
   if (!class(hdpsample) %in% c("hdpSampleChain", "hdpSampleMulti")) {
@@ -268,19 +268,19 @@ plot_dp_comp_exposure <- function(hdpsample, dpindices, col_comp, dpnames=NULL,
   ndp <- nrow(dp_distn$mean)
   ncomp <- ncol(dp_distn$mean)
   if (!is.numeric(dpindices) | any(dpindices %% 1 != 0) |
-        any(dpindices < 1) | any(dpindices > ndp)) {
+      any(dpindices < 1) | any(dpindices > ndp)) {
     stop(paste("dpindices must be integers between 1 and", ndp))
   }
   if (!length(col_comp) >= ncomp) {
     stop(paste("col_comp must specify at least", ncomp, "colours"))
   }
   if (!class(dpnames) %in% c("character", "NULL") |
-        !length(dpnames) %in% c(length(dpindices), 0)) {
+      !length(dpnames) %in% c(length(dpindices), 0)) {
     stop("dpnames must be a character vector with
          same length as dpindices, or NULL")
   }
   if (!class(main_text) %in% c("character", "NULL") |
-        !length(main_text) %in% c(1, 0)) {
+      !length(main_text) %in% c(1, 0)) {
     stop("main_text must be a character string, or NULL")
   }
   if(class(incl_numdata_plot) != "logical") {
@@ -372,3 +372,76 @@ plot_dp_comp_exposure <- function(hdpsample, dpindices, col_comp, dpnames=NULL,
   }
 
 }
+
+############################################################################################################
+############################################Added by Mo#####################################################
+############################################################################################################
+
+#' Plot extracted components
+#'
+#' @param hdpsample A hdpSampleChain or hdpSampleMulti object including output
+#'  from \code{\link{hdp_extract_components}}
+#' @param chains A hdpSampleChain or hdpSampleMulti object in the list representation
+#' @name plotcomp
+#'
+#' @importFrom graphics abline axis barplot matplot mtext par plot points segments text
+#' @importFrom grDevices colorRampPalette
+#' @importFrom ggplot2 ggplot aes geom_boxplot scale_fill_manual ggtitle xlab ylab
+#' @importFrom data.table melt
+# @examples
+#' @param legend Logical - should a legend be included? (default TRUE)
+#' @export
+#' @rdname plotcomp
+#'
+plot_chain_hdpsig_exp <- function(hdpsample, chains,
+                           legend=TRUE){
+
+  chain <- sum.exposure <- NULL
+  # input checks
+  if (!class(hdpsample) %in% c("hdpSampleChain", "hdpSampleMulti")) {
+    stop("hdpsample must have class hdpSampleChain or hdpSampleMulti")
+  }
+  # if (!validObject(hdpsample)) stop("hdpsample not valid") # too slow on big objects
+  if (length(comp_categ_counts(hdpsample)) == 0) {
+    stop("No component info for hdpsample. First run hdp_extract_components")
+  }
+  if(class(legend) != "logical") stop("legend must be TRUE or FALSE")
+
+
+  sums <- t(sapply(comp_categ_counts(hdpsample), rowSums)) ##sums of exposures for each signature across all tumors in one post.sample
+
+  # colour ramp across posterior samples
+  comp.cols <- grDevices::rainbow(nrow(sums), alpha = 1)
+  chains.cols <- grDevices::rainbow(length(chains), alpha = 1)
+
+  post.sample.per.chain <- ncol(sums)/length(chains)
+
+  sums.melt <- data.table::melt(sums)
+
+  colnames(sums.melt) <- c("Comp","no.post.samp","sum.exposure")
+
+
+ ##Plot overall exposures
+  plot(x=jitter(rep(0:(nrow(sums)-1), ncol(sums))), xlab="Component",
+       xaxt="n", y=as.vector(sums), pch=1, col=comp.cols, ylab="Number of data items")
+  axis(1, at=0:(nrow(sums)-1), labels=rownames(sums))
+ ##plot exposures for each hdp signature
+  for(comp in unique(sums.melt$Comp)){
+
+    temp.sums.melt <- sums.melt[sums.melt$Comp==comp,]
+
+    temp.sums.melt$chain <- rep(1:length(chains),each = post.sample.per.chain)
+    temp.sums.melt$chain <- as.factor(temp.sums.melt$chain)
+    plot.2 <- ggplot2::ggplot(data=temp.sums.melt,
+                              ggplot2::aes(x=chain, y=sum.exposure,fill=chain)) +
+      ggplot2::geom_boxplot()+
+      ggplot2::scale_fill_manual(values=chains.cols)+
+      ggplot2::ggtitle(paste0("hdp.",comp," exposure"))+
+      ggplot2::xlab("Posterior chain") +
+      ggplot2::ylab("Exposure of all tumors")
+    plot(plot.2)
+  }
+
+}
+
+
