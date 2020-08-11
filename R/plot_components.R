@@ -229,7 +229,7 @@ plot_comp_distn <- function(hdpsample, comp=NULL, cat_names=NULL,
 }
 
 
-#' @param dpindices Indices of DP nodes to plot
+#' @param input.catalog input catalog for samples
 #' @param col_comp Colours of each component, from 0 to the max number
 #' @param dpnames (Optional) Names of the DP nodes
 #' @param main_text (Optional) Text at top of plot
@@ -247,7 +247,8 @@ plot_comp_distn <- function(hdpsample, comp=NULL, cat_names=NULL,
 #' @param oma See ?par
 #' @export
 #' @rdname plotcomp
-plot_dp_comp_exposure <- function(hdpsample, dpindices, col_comp, dpnames=NULL,
+plot_dp_comp_exposure <- function(hdpsample, input.catalog,
+                                  col_comp, dpnames=NULL,
                                   main_text=NULL, incl_numdata_plot=TRUE,
                                   incl_nonsig=TRUE, incl_comp0=TRUE,
                                   ylab_numdata="Number of data items",
@@ -267,6 +268,10 @@ plot_dp_comp_exposure <- function(hdpsample, dpindices, col_comp, dpnames=NULL,
   dp_distn <- comp_dp_distn(hdpsample)
   ndp <- nrow(dp_distn$mean)
   ncomp <- ncol(dp_distn$mean)
+  if(is.null(dpnames)){
+    stop("Sample name is needed for this plotting")
+  }
+  dpindices <- (ndp-length(dpnames)+1):ndp
   if (!is.numeric(dpindices) | any(dpindices %% 1 != 0) |
       any(dpindices < 1) | any(dpindices > ndp)) {
     stop(paste("dpindices must be integers between 1 and", ndp))
@@ -345,7 +350,7 @@ plot_dp_comp_exposure <- function(hdpsample, dpindices, col_comp, dpnames=NULL,
   num_leg_col <- floor(sqrt(length(inc)))
 
   if (incl_numdata_plot){
-    par(mfrow=c(2, 1), mar=mar, oma=oma, cex.axis=cex.axis, las=1)
+    par(mfrow=c(2, 1), mar=mar, oma=oma, cex.axis=cex.axis, las=2)
 
     barplot(numdata[dp_order], main=main_text, col="gray", space=0, border=NA,
             names.arg="", ylab=ylab_numdata,
@@ -371,7 +376,23 @@ plot_dp_comp_exposure <- function(hdpsample, dpindices, col_comp, dpnames=NULL,
                              ncol=num_leg_col), ...)
   }
 
+  ##for each signature, plotting the top 5 tumors
+  for(i in 1:nrow(exposures)){
+    dp_order_sig <- order(exposures[i,], decreasing=TRUE)
+    par(mfrow=c(2, 1), mar=mar, oma=oma, cex.axis=cex.axis, las=2)
+
+    barplot(as.matrix(exposures[inc, dp_order, drop=FALSE]), space=0, col=col_comp[inc], border=NA,
+            ylim=c(0, 1), names.arg=dpnames[dp_order], ylab=ylab_exp,
+            cex.names=cex.names,main = paste0("hdp.",row.names(exposures)[i]))
+    ICAMS::PlotCatalog(ICAMS::as.catalog(input.catalog[,dp_order_sig[1]]))
+    ICAMS::PlotCatalog(ICAMS::as.catalog(input.catalog[,dp_order_sig[2]]))
+    ICAMS::PlotCatalog(ICAMS::as.catalog(input.catalog[,dp_order_sig[3]]))
+    ICAMS::PlotCatalog(ICAMS::as.catalog(input.catalog[,dp_order_sig[4]]))
+    ICAMS::PlotCatalog(ICAMS::as.catalog(input.catalog[,dp_order_sig[5]]))
+  }
+
 }
+
 
 ############################################################################################################
 ############################################Added by Mo#####################################################

@@ -36,7 +36,7 @@ plot_comp_distn(
 
 plot_dp_comp_exposure(
   hdpsample,
-  dpindices,
+  input.catalog,
   col_comp,
   dpnames = NULL,
   main_text = NULL,
@@ -98,7 +98,7 @@ relative contribution (multiplicative)}
 
 \item{cex.cat}{Expansion factor for the (optional) cat_names}
 
-\item{dpindices}{Indices of DP nodes to plot}
+\item{input.catalog}{input catalog for samples}
 
 \item{col_comp}{Colours of each component, from 0 to the max number}
 

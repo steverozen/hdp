@@ -42,7 +42,6 @@ hdp <- hdp_posterior(hdp, burnin=2000, n=50, space=50, cpiter=3, seed=1e6)
 hdp_ex <- hdp_extract_components(hdp)
 plot_comp_size(hdp_ex)
 plot_comp_distn(hdp_ex)
-plot_dp_comp_exposure(hdp_ex, 5:104, col_comp=rainbow(5))
 }
 \seealso{
 \code{\link{hdp_init}}

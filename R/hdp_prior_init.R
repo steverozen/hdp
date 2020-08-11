@@ -29,7 +29,7 @@
 #' hdp_ex <- hdp_extract_components(hdp)
 #' plot_comp_size(hdp_ex)
 #' plot_comp_distn(hdp_ex)
-#' plot_dp_comp_exposure(hdp_ex, 5:104, col_comp=rainbow(5))
+
 
 
 hdp_prior_init <- function(prior_distn, prior_pseudoc, hh, alphaa, alphab){
