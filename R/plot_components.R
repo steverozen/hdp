@@ -386,9 +386,9 @@ plot_dp_comp_exposure <- function(hdpsample, input.catalog,
             cex.names=cex.names,main = paste0("hdp.",row.names(exposures)[i]))
 
 
-    old.par <- par(mfrow = c(8, 1), mar = c(2, 2, 2, 2), oma = c(2, 2, 2, 2))
+    old.par <- par(mfrow = c(6, 1), mar = c(2, 2, 2, 2), oma = c(2, 2, 2, 2))
     on.exit(par(old.par))
-    for (j in 1:8) {
+    for (j in 1:6) {
       ICAMS::PlotCatalog(ICAMS::as.catalog(input.catalog[,dp_order_sig[j], drop=FALSE]))
     }
 
