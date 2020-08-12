@@ -22,7 +22,6 @@
 # plot_dp_comp_exposure(mut_example_multi, 5:30,
 #                       RColorBrewer::brewer.pal(12, "Set3"),
 #                       incl_numdata_plot=FALSE, incl_nonsig=FALSE)
-NULL
 #> NULL
 
 
@@ -228,7 +227,7 @@ plot_comp_distn <- function(hdpsample, comp=NULL, cat_names=NULL,
   }
 }
 
-
+#' Plot hdp signature exposure in each sample
 #' @param input.catalog input catalog for samples
 #' @param col_comp Colours of each component, from 0 to the max number
 #' @param dpnames (Optional) Names of the DP nodes
@@ -402,13 +401,11 @@ plot_dp_comp_exposure <- function(hdpsample, input.catalog,
 ############################################Added by Mo#####################################################
 ############################################################################################################
 
-#' Plot extracted components
+#' Plot hdp signature exposure on each chain
 #'
 #' @param hdpsample A hdpSampleChain or hdpSampleMulti object including output
 #'  from \code{\link{hdp_extract_components}}
 #' @param chains A hdpSampleChain or hdpSampleMulti object in the list representation
-#' @name plotcomp
-#'
 #' @importFrom graphics abline axis barplot matplot mtext par plot points segments text
 #' @importFrom grDevices colorRampPalette
 #' @importFrom ggplot2 ggplot aes geom_boxplot scale_fill_manual ggtitle xlab ylab
@@ -416,7 +413,6 @@ plot_dp_comp_exposure <- function(hdpsample, input.catalog,
 # @examples
 #' @param legend Logical - should a legend be included? (default TRUE)
 #' @export
-#' @rdname plotcomp
 #'
 plot_chain_hdpsig_exp <- function(hdpsample, chains,
                                   legend=TRUE){
@@ -470,5 +466,45 @@ plot_chain_hdpsig_exp <- function(hdpsample, chains,
   }
 
 }
+
+
+############################################################################################################
+############################################Added by Mo#####################################################
+############################################################################################################
+
+#' A tsne plot for signatures and tumors
+#'
+#' @param exposure An exposure matrix
+#' @param colorcategory A list of category of samples for labelling tsne plot.
+#'                Length is equal as number of samples
+#' @importFrom graphics abline axis barplot matplot mtext par plot points segments text
+#' @importFrom grDevices colorRampPalette
+#' @importFrom ggplot2 ggplot aes element_text geom_point theme
+#' @importFrom Rtsne Rtsne
+# @examples
+#' @export
+#' @rdname plotcomp
+plot_tsne_sigs_tumortype <- function(exposure,
+                                     colorcategory = NULL){
+  ColorCat <- x <- y <- NULL
+  set.seed(44) # for reproducibility
+  tsne.out<- Rtsne::Rtsne(t(exposure))
+  tsne.plot <- data.frame(x = tsne.out$Y[,1], y = tsne.out$Y[,2], tumorname = colnames(exposure))
+
+  if(!is.null(colorcategory)){
+    tsne.plot$ColorCat <- colorcategory
+  }else{
+    tsne.plot$ColorCat <- apply(tsne.plot,1,function(x){
+      x["TumorType"] <- unlist(strsplit(x["tumorname"],"::"))[1]
+    })
+  }
+
+
+  plot <- ggplot2::ggplot(tsne.plot) + ggplot2::geom_point(ggplot2::aes(x=x, y=y, color=ColorCat))+
+    ggplot2::theme(legend.text= ggplot2::element_text(size=8))
+
+  plot(plot)
+}
+
 
 

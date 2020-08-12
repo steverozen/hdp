@@ -5,7 +5,7 @@
 \alias{plot_comp_size}
 \alias{plot_comp_distn}
 \alias{plot_dp_comp_exposure}
-\alias{plot_chain_hdpsig_exp}
+\alias{plot_tsne_sigs_tumortype}
 \title{Plot extracted components}
 \usage{
 plot_comp_size(
@@ -53,7 +53,7 @@ plot_dp_comp_exposure(
   ...
 )
 
-plot_chain_hdpsig_exp(hdpsample, chains, legend = TRUE)
+plot_tsne_sigs_tumortype(exposure, colorcategory = NULL)
 }
 \arguments{
 \item{hdpsample}{A hdpSampleChain or hdpSampleMulti object including output
@@ -128,10 +128,15 @@ be included (per DP)? (Default TRUE)}
 
 \item{oma}{See ?par}
 
-\item{chains}{A hdpSampleChain or hdpSampleMulti object in the list representation}
+\item{exposure}{An exposure matrix}
+
+\item{colorcategory}{A list of category of samples for labelling tsne plot.
+Length is equal as number of samples}
 }
 \description{
 Plot extracted components
 
-Plot extracted components
+Plot hdp signature exposure in each sample
+
+A tsne plot for signatures and tumors
 }
