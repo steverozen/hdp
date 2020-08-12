@@ -386,9 +386,9 @@ plot_dp_comp_exposure <- function(hdpsample, input.catalog,
             cex.names=cex.names,main = paste0("hdp.",row.names(exposures)[i]))
 
 
-    old.par <- par(mfrow = c(5, 1), mar = c(2, 2, 2, 2), oma = c(2, 2, 2, 2))
+    old.par <- par(mfrow = c(8, 1), mar = c(2, 2, 2, 2), oma = c(2, 2, 2, 2))
     on.exit(par(old.par))
-    for (j in 1:5) {
+    for (j in 1:8) {
       ICAMS::PlotCatalog(ICAMS::as.catalog(input.catalog[,dp_order_sig[j], drop=FALSE]))
     }
 
@@ -448,7 +448,7 @@ plot_chain_hdpsig_exp <- function(hdpsample, chains,
 
   ##Plot overall exposures
   plot(x=jitter(rep(0:(nrow(sums)-1), ncol(sums))), xlab="Component",
-       xaxt="n", y=as.vector(sums), pch=1, col=comp.cols, ylab="Number of data items")
+       xaxt="n", y=as.vector(sums), pch=1, ylab="Number of data items")
   axis(1, at=0:(nrow(sums)-1), labels=rownames(sums))
   ##plot exposures for each hdp signature
 
