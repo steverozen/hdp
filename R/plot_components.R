@@ -381,14 +381,18 @@ plot_dp_comp_exposure <- function(hdpsample, input.catalog,
     dp_order_sig <- order(exposures[i,], decreasing=TRUE)
     par(mfrow=c(2, 1), mar=mar, oma=oma, cex.axis=cex.axis, las=2)
 
-    barplot(as.matrix(exposures[inc, dp_order, drop=FALSE]), space=0, col=col_comp[inc], border=NA,
+    barplot(as.matrix(exposures[inc, dp_order_sig, drop=FALSE]), space=0, col=col_comp[inc], border=NA,
             ylim=c(0, 1), names.arg=dpnames[dp_order], ylab=ylab_exp,
             cex.names=cex.names,main = paste0("hdp.",row.names(exposures)[i]))
-    ICAMS::PlotCatalog(ICAMS::as.catalog(input.catalog[,dp_order_sig[1]]))
-    ICAMS::PlotCatalog(ICAMS::as.catalog(input.catalog[,dp_order_sig[2]]))
-    ICAMS::PlotCatalog(ICAMS::as.catalog(input.catalog[,dp_order_sig[3]]))
-    ICAMS::PlotCatalog(ICAMS::as.catalog(input.catalog[,dp_order_sig[4]]))
-    ICAMS::PlotCatalog(ICAMS::as.catalog(input.catalog[,dp_order_sig[5]]))
+
+
+    old.par <- par(mfrow = c(5, 1), mar = c(2, 2, 2, 2), oma = c(2, 2, 2, 2))
+    on.exit(par(old.par))
+    for (j in 1:5) {
+      ICAMS::PlotCatalog(ICAMS::as.catalog(input.catalog[,dp_order_sig[j], drop=FALSE]))
+    }
+
+
   }
 
 }
