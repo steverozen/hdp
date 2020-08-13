@@ -375,14 +375,41 @@ plot_dp_comp_exposure <- function(hdpsample, input.catalog,
                              ncol=num_leg_col), ...)
   }
 
+  data.exposures <- numdata*exposures
+  colnames(data.exposures) <- colnames(input.catalog)
+  row.names(data.exposures) <- paste0("hdp.",row.names(data.exposures))
+
+  Signature <- Sample <- Exposure <- Tumor <- NULL
+  if(any(grepl("::",colnames(data.exposures)))){
+    df <- data.table::melt(data.exposures)
+    colnames(df) <- c("Signature","Sample","Exposure")
+    df$Tumor <- apply(df,1,function(x){
+      x["Tumor"] <- unlist(strsplit(x["Sample"],"::"))[1]
+    })
+  }
+
   ##for each signature, plotting the top 5 tumors
-  for(i in 1:nrow(exposures)){
+  for(i in 1:nrow(data.exposures)){
     dp_order_sig <- order(exposures[i,], decreasing=TRUE)
-    par(mfrow=c(2, 1), mar=mar, oma=oma, cex.axis=cex.axis, las=2)
+    this.par <- par(mfrow=c(2, 1), mar=mar, oma=oma, cex.axis=cex.axis, las=2)
 
     barplot(as.matrix(exposures[inc, dp_order_sig, drop=FALSE]), space=0, col=col_comp[inc], border=NA,
             ylim=c(0, 1), names.arg=dpnames[dp_order], ylab=ylab_exp,
             cex.names=cex.names,main = paste0("hdp.",row.names(exposures)[i]))
+
+    sig <- row.names(data.exposures)[i]
+
+    sig.df <- df[df$Signature==sig,]
+
+    on.exit(par(this.par))
+    tumortype.exp.plot <- ggplot2::ggplot(data=sig.df,
+                                          ggplot2::aes(x=Sample, y=Exposure,fill=Tumor,color=Tumor)) +
+      ggplot2::geom_bar(stat="identity")+
+      ggplot2::ggtitle(paste0(sig," Exposure"))+
+      ggplot2::ylab("Exposure")+
+      ggplot2::scale_x_discrete(breaks=df$Tumor[nchar(as.character(df$Tumor))!=1])
+    plot(tumortype.exp.plot)
+
 
 
     old.par <- par(mfrow = c(6, 1), mar = c(2, 2, 2, 2), oma = c(2, 2, 2, 2))
@@ -488,23 +515,23 @@ plot_tsne_sigs_tumortype <- function(exposure,
                                      colorcategory = NULL){
   ColorCat <- x <- y <- NULL
   set.seed(44) # for reproducibility
-  tsne.out<- Rtsne::Rtsne(t(exposure))
+  tsne.out<- Rtsne::Rtsne(t(exposure),check_duplicates = FALSE)
   tsne.plot <- data.frame(x = tsne.out$Y[,1], y = tsne.out$Y[,2], tumorname = colnames(exposure))
 
   if(!is.null(colorcategory)){
     tsne.plot$ColorCat <- colorcategory
   }else{
     tsne.plot$ColorCat <- apply(tsne.plot,1,function(x){
-      x["TumorType"] <- unlist(strsplit(x["tumorname"],"::"))[1]
+      x["ColorCat"] <- unlist(strsplit(x["tumorname"],"::"))[1]
     })
   }
 
 
   plot <- ggplot2::ggplot(tsne.plot) + ggplot2::geom_point(ggplot2::aes(x=x, y=y, color=ColorCat))+
-    ggplot2::theme(legend.text= ggplot2::element_text(size=8))
+    ggplot2::theme(legend.text= ggplot2::element_text(size=8))+ggplot2::ggtitle("All Signatures")
 
   plot(plot)
-}
 
+}
 
 
