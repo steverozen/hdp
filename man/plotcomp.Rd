@@ -5,6 +5,7 @@
 \alias{plot_comp_size}
 \alias{plot_comp_distn}
 \alias{plot_dp_comp_exposure}
+\alias{plot_pca_sigs_tumortype}
 \alias{plot_tsne_sigs_tumortype}
 \title{Plot extracted components}
 \usage{
@@ -37,6 +38,7 @@ plot_comp_distn(
 plot_dp_comp_exposure(
   hdpsample,
   input.catalog,
+  ex.signature,
   col_comp,
   dpnames = NULL,
   main_text = NULL,
@@ -52,6 +54,8 @@ plot_dp_comp_exposure(
   oma = c(1.5, 1.5, 1, 1),
   ...
 )
+
+plot_pca_sigs_tumortype(exposure, colorcategory = NULL)
 
 plot_tsne_sigs_tumortype(exposure, colorcategory = NULL)
 }
@@ -100,6 +104,8 @@ relative contribution (multiplicative)}
 
 \item{input.catalog}{input catalog for samples}
 
+\item{ex.signature}{extracted signature from hdp}
+
 \item{col_comp}{Colours of each component, from 0 to the max number}
 
 \item{dpnames}{(Optional) Names of the DP nodes}
@@ -137,6 +143,8 @@ Length is equal as number of samples}
 Plot extracted components
 
 Plot hdp signature exposure in each sample
+
+A pca plot for signatures and tumors
 
 A tsne plot for signatures and tumors
 }

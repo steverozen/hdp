@@ -1,6 +1,6 @@
 Package: hdpx
 Title: Forked from Nicola Robert's Hierarchical Dirichlet Process for categorical count data
-Version: 0.1.5.0023
+Version: 0.1.5.0024
 Authors@R: c(person("Steve", "Rozen", email="steverozen@gmail.com", role="aut"),
   person("Nicola", "Roberts", email="nr3@sanger.ac.uk", role=c("aut", "cre")),
   person("Yee Whye", "Teh", role=c("aut", "cph"),
@@ -17,8 +17,10 @@ Imports:
     Matrix,
     ggplot2,
     ICAMS,
-    data.table,
-    Rtsne
+    reshape2,
+    Rtsne,
+    stats,
+    beeswarm
 LazyData: true
 Description: Model categorical count data with a hierarchical Dirichlet
     Process. Includes functions to initialise a HDP with a custom tree
