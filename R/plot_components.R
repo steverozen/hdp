@@ -427,6 +427,7 @@ plot_dp_comp_exposure <- function(hdpsample, input.catalog,ex.signature,
     old.par <- par(mfrow = c(6, 1), mar = c(2, 2, 2, 2), oma = c(2, 2, 2, 2))
     on.exit(par(old.par))
     ICAMS::PlotCatalog(ICAMS::as.catalog(ex.signature[,i],catalog.type = "counts.signature"))
+
     for (j in 1:5) {
       ICAMS::PlotCatalog(ICAMS::as.catalog(input.catalog[,dp_order_sig[j], drop=FALSE]))
     }
