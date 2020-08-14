@@ -406,7 +406,7 @@ plot_dp_comp_exposure <- function(hdpsample, input.catalog,ex.signature,
   ##for each signature, plotting the top 5 tumors
   for(i in 1:nrow(data.exposures)){
     dp_order_sig <- order(exposures[i,], decreasing=TRUE)
-    this.par <- par(mfrow=c(2, 1), mar=mar, oma=oma, cex.axis=cex.axis, las=2)
+    this.par <- par(mfrow=c(2, 1), mar=mar, oma=oma, cex.axis=cex.axis, las=1)
 
     this.col <- rep("grey",length(col_comp))
     this.col[i] <- col_comp[i]
@@ -426,7 +426,8 @@ plot_dp_comp_exposure <- function(hdpsample, input.catalog,ex.signature,
 
     old.par <- par(mfrow = c(6, 1), mar = c(2, 2, 2, 2), oma = c(2, 2, 2, 2))
     on.exit(par(old.par))
-    ICAMS::PlotCatalog(ICAMS::as.catalog(ex.signature[,i],catalog.type = "counts.signature"))
+    ICAMS::PlotCatalog(ICAMS::as.catalog(ex.signature[,i,drop=FALSE],catalog.type = "counts.signature"))
+
     for (j in 1:5) {
       ICAMS::PlotCatalog(ICAMS::as.catalog(input.catalog[,dp_order_sig[j], drop=FALSE]))
     }
@@ -605,7 +606,7 @@ plot_tsne_sigs_tumortype <- function(exposure,
   plot(plot)
 
   for(sig in row.names(exposure)){
-    pca.plot$sig <- exposure[sig,]
+    tsne.plot$sig <- exposure[sig,]
     plot <- ggplot2::ggplot(tsne.plot) + ggplot2::geom_point(ggplot2::aes(x=x, y=y, color=sig))+
       ggplot2::theme(legend.text= ggplot2::element_text(size=8))+ggplot2::ggtitle(sig)+
       ggplot2::scale_color_gradient(low = "yellow", high = "red")
