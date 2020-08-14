@@ -91,6 +91,7 @@ plot_comp_size <- function(hdpsample, legend=TRUE, col_a="hotpink",
 #' @param cex.cat Expansion factor for the (optional) cat_names
 #' @export
 #' @rdname plotcomp
+#'
 plot_comp_distn <- function(hdpsample, comp=NULL, cat_names=NULL,
                             grouping=NULL, col="grey70", col_nonsig=NULL,
                             show_group_labels=FALSE, cred_int=TRUE,
@@ -191,12 +192,23 @@ plot_comp_distn <- function(hdpsample, comp=NULL, cat_names=NULL,
     }
 
     # max plotting height
-    plottop <- ceiling(max(ci)/0.1)*0.1
+    ci[is.na(ci)] <- 0
+    sig[is.na(sig)] <- 0
+    if(max(ci)==0){
+      plottop <- max(sig)+0.05
+    }else{
+      plottop <- ceiling(max(ci)/0.1)*0.1+0.01
+    }
+
+
+
+
 
     # main barplot
+
     b <- barplot(sig, col=cat_cols_copy, xaxt="n", ylim=c(0,plottop*1.1),
                  border=NA, names.arg=rep("", ncat), xpd=F, las=1,
-                 main=plot_title[ii], ...)
+                 main=plot_title[ii],...)
 
     # add credibility intervals
     if (cred_int & !is.null(ci)){
@@ -227,9 +239,11 @@ plot_comp_distn <- function(hdpsample, comp=NULL, cat_names=NULL,
   }
 }
 
+
 #' Plot hdp signature exposure in each sample
 #' @param input.catalog input catalog for samples
 #' @param col_comp Colours of each component, from 0 to the max number
+#' @param ex.signature extracted signature from hdp
 #' @param dpnames (Optional) Names of the DP nodes
 #' @param main_text (Optional) Text at top of plot
 #' @param incl_numdata_plot Logical - should an upper barplot indicating the number of
@@ -244,9 +258,10 @@ plot_comp_distn <- function(hdpsample, comp=NULL, cat_names=NULL,
 #' @param cex.axis Expansion factor for vertical-axis annotation
 #' @param mar See ?par
 #' @param oma See ?par
+#' @importFrom beeswarm beeswarm
 #' @export
 #' @rdname plotcomp
-plot_dp_comp_exposure <- function(hdpsample, input.catalog,
+plot_dp_comp_exposure <- function(hdpsample, input.catalog,ex.signature,
                                   col_comp, dpnames=NULL,
                                   main_text=NULL, incl_numdata_plot=TRUE,
                                   incl_nonsig=TRUE, incl_comp0=TRUE,
@@ -381,7 +396,7 @@ plot_dp_comp_exposure <- function(hdpsample, input.catalog,
 
   Signature <- Sample <- Exposure <- Tumor <- NULL
   if(any(grepl("::",colnames(data.exposures)))){
-    df <- data.table::melt(data.exposures)
+    df <- reshape2::melt(data.exposures)
     colnames(df) <- c("Signature","Sample","Exposure")
     df$Tumor <- apply(df,1,function(x){
       x["Tumor"] <- unlist(strsplit(x["Sample"],"::"))[1]
@@ -393,7 +408,10 @@ plot_dp_comp_exposure <- function(hdpsample, input.catalog,
     dp_order_sig <- order(exposures[i,], decreasing=TRUE)
     this.par <- par(mfrow=c(2, 1), mar=mar, oma=oma, cex.axis=cex.axis, las=2)
 
-    barplot(as.matrix(exposures[inc, dp_order_sig, drop=FALSE]), space=0, col=col_comp[inc], border=NA,
+    this.col <- rep("grey",length(col_comp))
+    this.col[i] <- col_comp[i]
+
+    barplot(as.matrix(exposures[inc, dp_order_sig, drop=FALSE]), space=0, col=this.col, border=NA,
             ylim=c(0, 1), names.arg=dpnames[dp_order], ylab=ylab_exp,
             cex.names=cex.names,main = paste0("hdp.",row.names(exposures)[i]))
 
@@ -402,19 +420,14 @@ plot_dp_comp_exposure <- function(hdpsample, input.catalog,
     sig.df <- df[df$Signature==sig,]
 
     on.exit(par(this.par))
-    tumortype.exp.plot <- ggplot2::ggplot(data=sig.df,
-                                          ggplot2::aes(x=Sample, y=Exposure,fill=Tumor,color=Tumor)) +
-      ggplot2::geom_bar(stat="identity")+
-      ggplot2::ggtitle(paste0(sig," Exposure"))+
-      ggplot2::ylab("Exposure")+
-      ggplot2::scale_x_discrete(breaks=df$Tumor[nchar(as.character(df$Tumor))!=1])
-    plot(tumortype.exp.plot)
 
+    beeswarm::beeswarm(Exposure~Tumor,data=sig.df,method="swarm",col=1:3, pch=19, cex=.75)
 
 
     old.par <- par(mfrow = c(6, 1), mar = c(2, 2, 2, 2), oma = c(2, 2, 2, 2))
     on.exit(par(old.par))
-    for (j in 1:6) {
+    ICAMS::PlotCatalog(ICAMS::as.catalog(ex.signature[,i],catalog.type = "counts.signature"))
+    for (j in 1:5) {
       ICAMS::PlotCatalog(ICAMS::as.catalog(input.catalog[,dp_order_sig[j], drop=FALSE]))
     }
 
@@ -436,7 +449,8 @@ plot_dp_comp_exposure <- function(hdpsample, input.catalog,
 #' @importFrom graphics abline axis barplot matplot mtext par plot points segments text
 #' @importFrom grDevices colorRampPalette
 #' @importFrom ggplot2 ggplot aes geom_boxplot scale_fill_manual ggtitle xlab ylab
-#' @importFrom data.table melt
+#' @importFrom reshape2 melt
+#' @importFrom stats prcomp
 # @examples
 #' @param legend Logical - should a legend be included? (default TRUE)
 #' @export
@@ -444,7 +458,7 @@ plot_dp_comp_exposure <- function(hdpsample, input.catalog,
 plot_chain_hdpsig_exp <- function(hdpsample, chains,
                                   legend=TRUE){
 
-  chain <- sum.exposure <- NULL
+  chain <- sum.exposure <- x <- y <- NULL
   # input checks
   if (!class(hdpsample) %in% c("hdpSampleChain", "hdpSampleMulti")) {
     stop("hdpsample must have class hdpSampleChain or hdpSampleMulti")
@@ -464,7 +478,22 @@ plot_chain_hdpsig_exp <- function(hdpsample, chains,
 
   post.sample.per.chain <- ncol(sums)/length(chains)
 
-  sums.melt <- data.table::melt(sums)
+
+###a pca plot based on exposures and posterior samples in chains
+ ##############################################################
+  pca_out <- stats::prcomp(t(sums), scale. = TRUE)
+  pca.plot <- data.frame(x=pca_out$x[,1],y=pca_out$x[,2],
+                         chain =  as.factor(rep(1:length(chains),each = post.sample.per.chain)))
+
+  plot <- ggplot2::ggplot(pca.plot,ggplot2::aes(x=x, y=y, color=chain)) + ggplot2::geom_point()+
+    ggplot2::scale_colour_manual(values = chains.cols)+
+    ggplot2::theme(legend.text= ggplot2::element_text(size=8))+ggplot2::geom_label(
+      data=pca.plot,
+      aes(label=chain)
+    )
+  plot(plot)
+  ##############################################################
+  sums.melt <- reshape2::melt(sums)
 
   colnames(sums.melt) <- c("Comp","no.post.samp","sum.exposure")
 
@@ -482,9 +511,8 @@ plot_chain_hdpsig_exp <- function(hdpsample, chains,
     temp.sums.melt$chain <- rep(1:length(chains),each = post.sample.per.chain)
     temp.sums.melt$chain <- as.factor(temp.sums.melt$chain)
     plot.2 <- ggplot2::ggplot(data=temp.sums.melt,
-                              ggplot2::aes(x=chain, y=sum.exposure,fill=chain)) +
+                              ggplot2::aes(x=chain, y=sum.exposure)) +
       ggplot2::geom_boxplot()+
-      ggplot2::scale_fill_manual(values=chains.cols)+
       ggplot2::ggtitle(paste0("hdp.",comp," exposure"))+
 
       ggplot2::xlab("Posterior chain") +
@@ -499,7 +527,7 @@ plot_chain_hdpsig_exp <- function(hdpsample, chains,
 ############################################Added by Mo#####################################################
 ############################################################################################################
 
-#' A tsne plot for signatures and tumors
+#' A pca plot for signatures and tumors
 #'
 #' @param exposure An exposure matrix
 #' @param colorcategory A list of category of samples for labelling tsne plot.
@@ -507,12 +535,56 @@ plot_chain_hdpsig_exp <- function(hdpsample, chains,
 #' @importFrom graphics abline axis barplot matplot mtext par plot points segments text
 #' @importFrom grDevices colorRampPalette
 #' @importFrom ggplot2 ggplot aes element_text geom_point theme
+# @examples
+#' @export
+#' @rdname plotcomp
+plot_pca_sigs_tumortype <- function(exposure,
+                                     colorcategory = NULL){
+  ColorCat <- x <- y <- NULL
+  pca.out <- stats::prcomp(t(exposure), scale. = TRUE)
+  pca.plot <- data.frame(x=pca.out$x[,1],y=pca.out$x[,2],
+                         tumorname = colnames(exposure))
+
+  if(!is.null(colorcategory)){
+    pca.plot$ColorCat <- colorcategory
+  }else{
+    pca.plot$ColorCat <- apply(pca.plot,1,function(x){
+      x["ColorCat"] <- unlist(strsplit(x["tumorname"],"::"))[1]
+    })
+  }
+
+  plot <- ggplot2::ggplot(pca.plot) + ggplot2::geom_point(ggplot2::aes(x=x, y=y, color=ColorCat))+
+    ggplot2::theme(legend.text= ggplot2::element_text(size=8))+ggplot2::ggtitle("All Signatures")
+
+  plot(plot)
+
+  for(sig in row.names(exposure)){
+    pca.plot$sig <- exposure[sig,]
+    plot <- ggplot2::ggplot(pca.plot) + ggplot2::geom_point(ggplot2::aes(x=x, y=y, color=sig))+
+      ggplot2::theme(legend.text= ggplot2::element_text(size=8))+ggplot2::ggtitle(sig)+
+      ggplot2::scale_color_gradient(low = "yellow", high = "red")
+    plot(plot)
+
+  }
+
+}
+
+
+
+#' A tsne plot for signatures and tumors
+#'
+#' @param exposure An exposure matrix
+#' @param colorcategory A list of category of samples for labelling tsne plot.
+#'                Length is equal as number of samples
+#' @importFrom graphics abline axis barplot matplot mtext par plot points segments text
+#' @importFrom grDevices colorRampPalette
+#' @importFrom ggplot2 ggplot aes element_text geom_point theme scale_color_gradient
 #' @importFrom Rtsne Rtsne
 # @examples
 #' @export
 #' @rdname plotcomp
 plot_tsne_sigs_tumortype <- function(exposure,
-                                     colorcategory = NULL){
+                                    colorcategory = NULL){
   ColorCat <- x <- y <- NULL
   set.seed(44) # for reproducibility
   tsne.out<- Rtsne::Rtsne(t(exposure),check_duplicates = FALSE)
@@ -532,6 +604,16 @@ plot_tsne_sigs_tumortype <- function(exposure,
 
   plot(plot)
 
+  for(sig in row.names(exposure)){
+    pca.plot$sig <- exposure[sig,]
+    plot <- ggplot2::ggplot(tsne.plot) + ggplot2::geom_point(ggplot2::aes(x=x, y=y, color=sig))+
+      ggplot2::theme(legend.text= ggplot2::element_text(size=8))+ggplot2::ggtitle(sig)+
+      ggplot2::scale_color_gradient(low = "yellow", high = "red")
+    plot(plot)
+
+  }
+
+  ##ToDO a pca for every signature exposure
+
+
 }
-
-
