@@ -492,7 +492,7 @@ plot_chain_hdpsig_exp <- function(hdpsample, chains,
     ggplot2::theme(legend.text= ggplot2::element_text(size=8))+ggplot2::geom_label(
       data=pca.plot,
       aes(label=chain)
-    )
+    )+ggplot2::ggtitle("PCA of exposures in all posterior samples")
   plot(plot)
   ##############################################################
   sums.melt <- reshape2::melt(sums)
