@@ -395,12 +395,17 @@ plot_dp_comp_exposure <- function(hdpsample, input.catalog,ex.signature,
   row.names(data.exposures) <- paste0("hdp.",row.names(data.exposures))
 
   Signature <- Sample <- Exposure <- Tumor <- NULL
+
+  df <- reshape2::melt(data.exposures)
+  colnames(df) <- c("Signature","Sample","Exposure")
+
   if(any(grepl("::",colnames(data.exposures)))){
-    df <- reshape2::melt(data.exposures)
-    colnames(df) <- c("Signature","Sample","Exposure")
+
     df$Tumor <- apply(df,1,function(x){
       x["Tumor"] <- unlist(strsplit(x["Sample"],"::"))[1]
     })
+  }else{
+    df$Tumor <- "No specific tumor type"
   }
 
   ##for each signature, plotting the top 5 tumors
