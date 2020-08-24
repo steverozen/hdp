@@ -338,11 +338,6 @@ plot_dp_comp_exposure <- function(hdpsample, input.catalog,ex.signature,
 
   # mean exposures
   exposures <- t(dp_distn$mean[dpindices,,drop=FALSE])
-  # think I don't need this anymore with drop=FALSE above?
-  # if (nrow(exposures)==1) {
-  #   dim(exposures) <- rev(dim(exposures))
-  #   rownames(exposures) <- colnames(dp_distn$mean)
-  #   }
 
   # only include significantly non-zero exposures
   if (!incl_nonsig){
@@ -362,6 +357,8 @@ plot_dp_comp_exposure <- function(hdpsample, input.catalog,ex.signature,
   inc <- which(rowSums(exposures, na.rm=T)>0)
 
   num_leg_col <- floor(sqrt(length(inc)))
+
+
 
   if (incl_numdata_plot){
     par(mfrow=c(2, 1), mar=mar, oma=oma, cex.axis=cex.axis, las=2)
@@ -390,7 +387,7 @@ plot_dp_comp_exposure <- function(hdpsample, input.catalog,ex.signature,
                              ncol=num_leg_col), ...)
   }
 
-  data.exposures <- numdata*exposures
+  data.exposures <- t(numdata*t(exposures))
   colnames(data.exposures) <- colnames(input.catalog)
   row.names(data.exposures) <- paste0("hdp.",row.names(data.exposures))
 
@@ -416,11 +413,13 @@ plot_dp_comp_exposure <- function(hdpsample, input.catalog,ex.signature,
     this.col <- rep("grey",length(col_comp))
     this.col[i] <- col_comp[i]
 
-    barplot(as.matrix(exposures[inc, dp_order_sig, drop=FALSE]), space=0, col=this.col, border=NA,
-            ylim=c(0, 1), names.arg=dpnames[dp_order], ylab=ylab_exp,
-            cex.names=cex.names,main = paste0("hdp.",row.names(exposures)[i]))
+   # barplot(as.matrix(exposures[inc, dp_order_sig, drop=FALSE]), space=0, col=this.col, border=NA,
+  #        ylim=c(0, 1), names.arg=dpnames[dp_order], ylab=ylab_exp,
+   #         cex.names=cex.names,main = paste0("hdp.",row.names(exposures)[i]))
 
     sig <- row.names(data.exposures)[i]
+
+    plot(exposures[i,]~data.exposures[i,],xlab="Exposure",ylab="Prop.Exposure",main=sig,pch=16)
 
     sig.df <- df[df$Signature==sig,]
 
