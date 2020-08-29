@@ -423,8 +423,7 @@ hdp_merge_and_extract_components <- function(x,
 
     ##plot1
 
-    row.names(avgdistn_ccc4) <- ICAMS::catalog.row.order$SBS96
-    avgdistn_ccc4_catalog <- ICAMS::as.catalog(avgdistn_ccc4,catalog.type = "counts")
+    avgdistn_ccc4_catalog <- ICAMS::as.catalog(avgdistn_ccc4,catalog.type = "counts",infer.rownames = T)
     ICAMS::PlotCatalogToPdf(avgdistn_ccc4_catalog,
                             file.path(diagnostic.folder, "aggregated.spectrum.after.step4.pdf"))
 
@@ -433,8 +432,7 @@ hdp_merge_and_extract_components <- function(x,
 
       ##plot2
 
-      row.names(clust_hdp0_ccc4) <- ICAMS::catalog.row.order$SBS96
-      clust_hdp0_ccc4_catalog <- ICAMS::as.catalog(clust_hdp0_ccc4,catalog.type = "counts")
+     clust_hdp0_ccc4_catalog <- ICAMS::as.catalog(clust_hdp0_ccc4,catalog.type = "counts",infer.rownames = T)
       ICAMS::PlotCatalogToPdf(clust_hdp0_ccc4_catalog,
                               file.path(diagnostic.folder, "aggregated.spectrum.moved.to.hdp0.in.step4.pdf"))
 
@@ -507,16 +505,14 @@ hdp_merge_and_extract_components <- function(x,
 
     ##plot1
 
-    row.names(avgdistn_ccc4) <- ICAMS::catalog.row.order$SBS96
-    avgdistn_ccc4_catalog <- ICAMS::as.catalog(avgdistn_ccc4,catalog.type = "counts")
+    avgdistn_ccc4_catalog <- ICAMS::as.catalog(avgdistn_ccc4,catalog.type = "counts",infer.rownames = T)
     ICAMS::PlotCatalogToPdf(avgdistn_ccc4_catalog,file.path(diagnostic.folder, "aggregated.spectrum.after.step5.pdf"))
 
     if(ncol(clust_hdp0_ccc5)>0&&!is.null(ncol(clust_hdp0_ccc5))){
 
       ##plot2
 
-      row.names(clust_hdp0_ccc5) <- ICAMS::catalog.row.order$SBS96
-      clust_hdp0_ccc5_catalog <- ICAMS::as.catalog(clust_hdp0_ccc5,catalog.type = "counts")
+      clust_hdp0_ccc5_catalog <- ICAMS::as.catalog(clust_hdp0_ccc5,catalog.type = "counts",infer.rownames = T)
       ICAMS::PlotCatalogToPdf(clust_hdp0_ccc5_catalog,
                               file.path(diagnostic.folder, "aggregated.spectrum.moved.to.hdp0.in.step5.pdf"))
 
@@ -694,12 +690,12 @@ hdp_merge_and_extract_components <- function(x,
   x@comp_dp_counts <- lapply(cdc_ans, as, "dgCMatrix")
 
 
-  x@comp_categ_distn <- list(mean                                        = ccc_mean,
-                             cred.int                                    = ccc_credint,
-                             aggregated_raw_clusters_after_cos_merge     = avgdistn_ccc3,
-                             aggregated_raw_clusters_after_nonzero_categ = avgdistn_ccc4,
-                             clust_hdp0_ccc4                             = clust_hdp0_ccc4,
-                             clust_hdp0_ccc5                             = clust_hdp0_ccc5)
+  x@comp_categ_distn <- list(mean                           = ccc_mean,
+                             cred.int                       = ccc_credint,
+                             raw_clusts_after_cos_merge     = avgdistn_ccc3,
+                             raw_clusts_after_nonzero_categ = avgdistn_ccc4,
+                             clust_hdp0_ccc4                = clust_hdp0_ccc4,
+                             clust_hdp0_ccc5                = clust_hdp0_ccc5)
 
   x@comp_dp_distn <- list(mean=cdc_mean,
                           cred.int=cdc_credint)
