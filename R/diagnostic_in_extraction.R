@@ -75,9 +75,9 @@ diagnostic_in_extraction <- function(clust_hdp0_ccc,
 
     dir.create(file.path(diagnostic.folder,cluster.name), recursive = T)
 
-    row.names(individual.catalog) <- ICAMS::catalog.row.order$SBS96
+   # row.names(individual.catalog) <- ICAMS::catalog.row.order$SBS96
     if(ncol(individual.catalog)>0){
-      individual.catalog.catalog <- ICAMS::as.catalog(individual.catalog,catalog.type = "counts")
+      individual.catalog.catalog <- ICAMS::as.catalog(individual.catalog,catalog.type = "counts",infer.rownames = T)
       ICAMS::PlotCatalogToPdf(individual.catalog.catalog,
                               file.path(diagnostic.folder,cluster.name,"/individual.raw.cluster.pdf"))
 
