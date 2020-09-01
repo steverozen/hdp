@@ -432,6 +432,8 @@ hdp_merge_and_extract_components <- function(x,
 
       ##plot2
 
+      row.names(clust_hdp0_ccc4) <- NULL
+
      clust_hdp0_ccc4_catalog <- ICAMS::as.catalog(clust_hdp0_ccc4,catalog.type = "counts",infer.rownames = T)
       ICAMS::PlotCatalogToPdf(clust_hdp0_ccc4_catalog,
                               file.path(diagnostic.folder, "aggregated.spectrum.moved.to.hdp0.in.step4.pdf"))
@@ -511,6 +513,8 @@ hdp_merge_and_extract_components <- function(x,
     if(ncol(clust_hdp0_ccc5)>0&&!is.null(ncol(clust_hdp0_ccc5))){
 
       ##plot2
+
+      row.names(clust_hdp0_ccc5) <- NULL
 
       clust_hdp0_ccc5_catalog <- ICAMS::as.catalog(clust_hdp0_ccc5,catalog.type = "counts",infer.rownames = T)
       ICAMS::PlotCatalogToPdf(clust_hdp0_ccc5_catalog,
