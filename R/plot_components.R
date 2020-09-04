@@ -280,12 +280,15 @@ plot_dp_comp_exposure <- function(hdpsample, input.catalog,ex.signature,
     stop("No component info for hdpsample. First run hdp_extract_components")
   }
   dp_distn <- comp_dp_distn(hdpsample)
-  ndp <- nrow(dp_distn$mean)
+  ndp <- hdpsample@chains[[1]]@hdp@numdp
   ncomp <- ncol(dp_distn$mean)
   if(is.null(dpnames)){
     stop("Sample name is needed for this plotting")
   }
+
   dpindices <- (ndp-length(dpnames)+1):ndp
+
+
   if (!is.numeric(dpindices) | any(dpindices %% 1 != 0) |
       any(dpindices < 1) | any(dpindices > ndp)) {
     stop(paste("dpindices must be integers between 1 and", ndp))
@@ -337,7 +340,12 @@ plot_dp_comp_exposure <- function(hdpsample, input.catalog,ex.signature,
   }
 
   # mean exposures
-  exposures <- t(dp_distn$mean[dpindices,,drop=FALSE])
+  if(ndp > nrow(dp_distn$mean)){
+    exposures <- t(dp_distn$mean[1:length(dpnames),,drop=FALSE])
+  }else{
+    exposures <- t(dp_distn$mean[dpindices,,drop=FALSE])
+  }
+
 
   # only include significantly non-zero exposures
   if (!incl_nonsig){
@@ -389,7 +397,9 @@ plot_dp_comp_exposure <- function(hdpsample, input.catalog,ex.signature,
 
   data.exposures <- t(numdata*t(exposures))
   colnames(data.exposures) <- colnames(input.catalog)
-  row.names(data.exposures) <- paste0("hdp.",row.names(data.exposures))
+  row.names(data.exposures) <- paste0("hdp.",c(1:nrow(data.exposures)-1))
+
+  barplot(rowSums(data.exposures))
 
   Signature <- Sample <- Exposure <- Tumor <- NULL
 
@@ -623,3 +633,11 @@ plot_tsne_sigs_tumortype <- function(exposure,
 
 
 }
+
+
+
+
+
+
+
+

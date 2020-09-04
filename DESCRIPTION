@@ -1,6 +1,6 @@
 Package: hdpx
 Title: Forked from Nicola Robert's Hierarchical Dirichlet Process for categorical count data
-Version: 0.1.5.0025
+Version: 0.1.5.0026
 Authors@R: c(person("Steve", "Rozen", email="steverozen@gmail.com", role="aut"),
   person("Nicola", "Roberts", email="nr3@sanger.ac.uk", role=c("aut", "cre")),
   person("Yee Whye", "Teh", role=c("aut", "cph"),
@@ -20,7 +20,9 @@ Imports:
     reshape2,
     Rtsne,
     stats,
-    beeswarm
+    beeswarm,
+    Rcpp,
+    RcppArmadillo
 LazyData: true
 Description: Model categorical count data with a hierarchical Dirichlet
     Process. Includes functions to initialise a HDP with a custom tree
@@ -50,6 +52,7 @@ Collate:
     'diagnostic_in_extraction.R'
     'dp_activate.R'
     'dp_freeze.R'
+    'extract_sigs_from_clusters.R'
     'hdp.R'
     'hdp_addconparam.R'
     'hdp_adddp.R'
@@ -65,12 +68,15 @@ Collate:
     'hdp_quick_init.R'
     'hdp_setdata.R'
     'iterate.R'
+    'mo_utils.R'
     'plot_chain.R'
     'plot_components.R'
+    'RcppExports.R'
     'TestScaffold.R'
     'utilities.R'
     'utilities_nr3.R'
     'xmake.s.R'
     'zzz.R'
+LinkingTo: Rcpp,RcppArmadillo
 VignetteBuilder: knitr
 RoxygenNote: 7.1.1

@@ -18,7 +18,7 @@ test_that("hdp_merge_and_extract_components", {
 
 
 
-  #save(retvalx, file = "hdp.merge.and.extract.components.expected.Rdata")
+  save(retvalx, file = "hdp.merge.and.extract.components.expected.Rdata")
 
   expect_equal(retvalx, reg2$retvalx)
 
