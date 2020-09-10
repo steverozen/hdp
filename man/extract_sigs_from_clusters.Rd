@@ -2,26 +2,24 @@
 % Please edit documentation in R/extract_sigs_from_clusters.R
 \name{extract_sigs_from_clusters}
 \alias{extract_sigs_from_clusters}
-\title{This function combines part of NR's code and new way to look at sigantures from raw clusters
-This is a testing function that maybe or not work}
+\title{This function extract signatures from raw clusters discovered by hdp.
+This returns clusters with high confidence -extracted by more than 90% posterior samples;
+                           moderate confidence - extracted less than 90% but more than number of post.samples on one chain
+                           noise - less than number of post.samples on one chain
+and they are found in how many post.samples in 'stats'}
 \usage{
-extract_sigs_from_clusters(x, cos.merge, prop.samp, min.sample)
+extract_sigs_from_clusters(x, cos.merge = 0.9)
 }
 \arguments{
 \item{x}{hdpSampleChain or hdpSampleMulti object}
 
 \item{cos.merge}{Merge components with cosine similarity above this threshold (default 0.90)}
-
-\item{prop.samp}{The proportion of posterior samples with a certain cluster to be determined as                     a signature. e.g., if prop.samp = 0.5, a cluster will be determined as a                           signature if it appears in half of the posterior samples}
-
-\item{min.sample}{Components must have significant exposure in at least this many samples (i.e. those DP nodes with data assigned) (default 1)}
 }
 \value{
 A hdpSampleChain or hdpSampleMulti object updated with component information
 }
 \description{
-This function combines part of NR's code and new way to look at sigantures from raw clusters
-This is a testing function that maybe or not work
+ccc_0 and cdc_0 are for diagnostic checking and exposure summary
 }
 \seealso{
 \code{\link{hdp_posterior}}, \code{\link{hdp_multi_chain}},
