@@ -199,7 +199,8 @@ extract_sigs_from_clusters <-  function(x,
     }
 
   }
-
+  dataframe.merged <- dataframe.merged[,order(colSums(dataframe.merged),decreasing=T)]
+  stats.dataframe.merged <- stats.dataframe.merged[order(colSums(dataframe.merged),decreasing=T)]
 
   high.confident.spectrum <- dataframe.merged[,which(stats.dataframe.merged>=(0.9*nsamp))]
   high.confident.stats <- stats.dataframe.merged[which(stats.dataframe.merged>=(0.9*nsamp))]
