@@ -31,6 +31,7 @@ generate_label_high_cossim <- function(clust_label,
 #'@param cdc_0 a list object contains clust_dp_counts matrix from hdp
 #'@param cos.merge cosine similarity cutoff
 #'
+#'@export
 extract_ccc_cdc_from_hdp <- function(spectrum,
                                      ccc_0,
                                      cdc_0,
