@@ -186,7 +186,7 @@ extract_sigs_from_clusters <-  function(x,
 
     clust_cos <- cosCpp(as.matrix(dataframe.merged))
 
-    clust_same <- (clust_cos > 0.90 & lower.tri(clust_cos))
+    clust_same <- (clust_cos > cos.merge & lower.tri(clust_cos))
     same <- which(clust_same, arr.ind=TRUE) # merge these columns
     if (length(same)>0){
       for (index in 1:nrow(same)){
@@ -199,8 +199,8 @@ extract_sigs_from_clusters <-  function(x,
     }
 
   }
-  dataframe.merged <- dataframe.merged[,order(colSums(dataframe.merged),decreasing=T)]
-  stats.dataframe.merged <- stats.dataframe.merged[order(colSums(dataframe.merged),decreasing=T)]
+  #dataframe.merged <- dataframe.merged[,order(colSums(dataframe.merged),decreasing=T)]
+  #stats.dataframe.merged <- stats.dataframe.merged[order(colSums(dataframe.merged),decreasing=T)]
 
   high.confident.spectrum <- dataframe.merged[,which(stats.dataframe.merged>=(0.9*nsamp))]
   high.confident.stats <- stats.dataframe.merged[which(stats.dataframe.merged>=(0.9*nsamp))]
