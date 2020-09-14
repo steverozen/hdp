@@ -205,8 +205,8 @@ extract_sigs_from_clusters <-  function(x,
   high.confident.spectrum <- dataframe.merged[,which(stats.dataframe.merged>=(0.9*nsamp))]
   high.confident.stats <- stats.dataframe.merged[which(stats.dataframe.merged>=(0.9*nsamp))]
 
-  moderate.spectrum <- dataframe.merged[,intersect(which(stats.dataframe.merged>=(nsamp/nch)),which(stats.dataframe.merged<(0.9*nsamp)))]
-  moderate.stats <- stats.dataframe.merged[intersect(which(stats.dataframe.merged>=(nsamp/nch)),which(stats.dataframe.merged<(0.9*nsamp)))]
+  moderate.spectrum <- dataframe.merged[,intersect(which(stats.dataframe.merged>=(0.1*nsamp)),which(stats.dataframe.merged<(0.9*nsamp)))]
+  moderate.stats <- stats.dataframe.merged[intersect(which(stats.dataframe.merged>=(0.1*nsamp)),which(stats.dataframe.merged<(0.9*nsamp)))]
 
 
 
