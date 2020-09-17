@@ -101,7 +101,7 @@ extract_sigs_from_clusters <-  function(x,
   first.merge <- function(ccc,cdc){
     clust_label <- 1:ncol(ccc)
     clust_cos <- lsa::cosine(ccc)
-    clust_same <- (clust_cos > 0.95 & lower.tri(clust_cos))
+    clust_same <- (clust_cos > 0.99 & lower.tri(clust_cos))
     same <- which(clust_same, arr.ind=TRUE) # merge these columns
     if (length(same)>0){
       for (index in 1:nrow(same)){
@@ -141,7 +141,7 @@ extract_sigs_from_clusters <-  function(x,
     colnames(ccc_unlist) <- clust_label
 
 
-    clust_same <- (clust_cos > 0.95 & lower.tri(clust_cos))
+    clust_same <- (clust_cos > 0.99 & lower.tri(clust_cos))
     same <- which(clust_same, arr.ind=TRUE) # merge these columns
     if (length(same)>0){
       for (index in 1:nrow(same)){
