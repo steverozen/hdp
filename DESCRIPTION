@@ -42,7 +42,8 @@ Suggests:
     knitr,
     rmarkdown,
     BiocStyle,
-    devtools
+    devtools,
+    parallelDist
 Collate:
     'aaa-classes-input.R'
     'aaa-classes-output.R'

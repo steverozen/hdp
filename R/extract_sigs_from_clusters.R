@@ -14,7 +14,7 @@
 #' @seealso \code{\link{hdp_posterior}}, \code{\link{hdp_multi_chain}},
 #'  \code{\link{plot_comp_size}}, \code{\link{plot_comp_distn}},
 #'  \code{\link{plot_dp_comp_exposure}}
-#'  @importFrom stats cutree
+#' @importFrom stats cutree
 
 #' @export
 
@@ -168,7 +168,7 @@ extract_sigs_from_clusters <-  function(x,
   #stats.dataframe <- stats.dataframe[stats.dataframe$Freq>1,]
 
   dataframe.normed <- apply(dataframe,2,function(x)x/sum(x))
-  cosine.dist.df <- parallelDist(t(dataframe.normed),method = "cosine")
+  cosine.dist.df <- parallelDist::parallelDist(t(dataframe.normed),method = "cosine")
   cosine.dist.hctree <- stats::hclust(cosine.dist.df)
 
   ####decide best cutoff##########################################
