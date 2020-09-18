@@ -8,6 +8,7 @@
 #'
 #' @param x hdpSampleChain or hdpSampleMulti object
 #' @param cos.merge Merge components with cosine similarity above this threshold (default 0.90)
+#' @param confident.prop a numeric between 0.1 and 1. A cluster with                             confident.prop of total posterior samples will                          be determiend as high confident signature
 #'
 #' @return A hdpSampleChain or hdpSampleMulti object updated with component information
 #' @aliases extract_sigs_from_clusters
@@ -20,7 +21,8 @@
 
 
 extract_sigs_from_clusters <-  function(x,
-                                        cos.merge = 0.90){
+                                        cos.merge = 0.90,
+                                        confident.prop = 0.9){
   if (class(x)=="hdpSampleChain") {
     message('Extracting components on single chain.A hdpSampleMulti object is recommended, see ?hdp_multi_chain')
     is_multi <- FALSE
@@ -195,11 +197,11 @@ extract_sigs_from_clusters <-  function(x,
   ##############################################################
 
 
-  high.confident.spectrum <- spectrum.df[,which(spectrum.stats>=(0.9*nsamp))]
-  high.confident.stats <- spectrum.stats[which(spectrum.stats>=(0.9*nsamp))]
+  high.confident.spectrum <- spectrum.df[,which(spectrum.stats>=(confident.prop*nsamp))]
+  high.confident.stats <- spectrum.stats[which(spectrum.stats>=(confident.prop*nsamp))]
 
-  moderate.spectrum <- spectrum.df[,intersect(which(spectrum.stats>=(0.1*nsamp)),which(spectrum.stats<(0.9*nsamp)))]
-  moderate.stats <- spectrum.stats[intersect(which(spectrum.stats>=(0.1*nsamp)),which(spectrum.stats<(0.9*nsamp)))]
+  moderate.spectrum <- spectrum.df[,intersect(which(spectrum.stats>=(0.1*nsamp)),which(spectrum.stats<(confident.prop*nsamp)))]
+  moderate.stats <- spectrum.stats[intersect(which(spectrum.stats>=(0.1*nsamp)),which(spectrum.stats<(confident.prop*nsamp)))]
 
   noise.spectrum <- spectrum.df[,which(spectrum.stats<(0.1*nsamp))]
   noise.stats <- spectrum.stats[which(spectrum.stats<(0.1*nsamp))]
