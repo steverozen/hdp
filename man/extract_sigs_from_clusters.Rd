@@ -25,4 +25,5 @@ ccc_0 and cdc_0 are for diagnostic checking and exposure summary
 \code{\link{hdp_posterior}}, \code{\link{hdp_multi_chain}},
  \code{\link{plot_comp_size}}, \code{\link{plot_comp_distn}},
  \code{\link{plot_dp_comp_exposure}}
+ @importFrom stats cutree
 }

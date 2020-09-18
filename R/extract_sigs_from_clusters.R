@@ -14,10 +14,10 @@
 #' @seealso \code{\link{hdp_posterior}}, \code{\link{hdp_multi_chain}},
 #'  \code{\link{plot_comp_size}}, \code{\link{plot_comp_distn}},
 #'  \code{\link{plot_dp_comp_exposure}}
-#' @import clue
+#'  @importFrom stats cutree
+
 #' @export
-# @examples
-# hdp_extract_components(mut_example_multi)
+
 
 extract_sigs_from_clusters <-  function(x,
                                         cos.merge = 0.90){
@@ -164,55 +164,45 @@ extract_sigs_from_clusters <-  function(x,
     stats.dataframe <- rbind(stats.dataframe,summary[[i]]$stats)
 
   }
+  #dataframe <- dataframe[,stats.dataframe$Freq>1]##exclude spectrum that only extracted in 1 post sample in a chain
+  #stats.dataframe <- stats.dataframe[stats.dataframe$Freq>1,]
 
+  dataframe.normed <- apply(dataframe,2,function(x)x/sum(x))
+  cosine.dist.df <- parallelDist(t(dataframe.normed),method = "cosine")
+  cosine.dist.hctree <- stats::hclust(cosine.dist.df)
 
-  dataframe <- dataframe[,stats.dataframe$Freq>1]##exclude spectrum that only extracted in 1 post sample in a chain
-  stats.dataframe <- stats.dataframe[stats.dataframe$Freq>1,]
+  ####decide best cutoff##########################################
+  #####cut hc tree until no clusters have cos.sim > cos.cutoff####
+  for(h.cutoff in seq(0.01,max(cosine.dist.hctree$height),0.01)){
 
-  clust_label <- 1:ncol(dataframe)
-  colnames(dataframe) <- clust_label
-  clust_label <- generate_label_high_cossim(clust_label = clust_label,
-                                            matrix      = dataframe,
-                                            cos.sim     = cos.merge)
+    clusters <- cutree(cosine.dist.hctree,  h=h.cutoff)
+    spectrum.df <- matrix(ncol=0,nrow=nrow(dataframe.normed))
+    spectrum.stats <- {}
+      for(i in 1:length(unique(clusters))){
+        subindex <- which(clusters==i)
 
-  dataframe.merged <- data.frame(merge_cols(as.matrix(dataframe),clust_label))
-  stats.dataframe.merged <- data.frame(merge_cols(t(stats.dataframe$Freq),clust_label))
+        spectrum.df <- cbind(spectrum.df,rowSums(dataframe[,subindex,drop=FALSE]))
+        spectrum.stats <- c(spectrum.stats,sum(stats.dataframe[subindex,2]))
 
-  for(times in 1:5){
-    clust_label <- c(1:ncol(dataframe.merged))
-    colnames(dataframe.merged) <- clust_label
-
-    names(stats.dataframe.merged) <- clust_label
-
-    clust_cos <- cosCpp(as.matrix(dataframe.merged))
-
-    clust_same <- (clust_cos > cos.merge & lower.tri(clust_cos))
-    same <- which(clust_same, arr.ind=TRUE) # merge these columns
-    if (length(same)>0){
-      for (index in 1:nrow(same)){
-        clust_label[same[index, 1]] <- clust_label[same[index, 2]]
       }
-      dataframe.merged <- data.frame(merge_cols(as.matrix(dataframe.merged),clust_label))
-      stats.dataframe.merged <- data.frame(merge_cols(as.matrix(stats.dataframe.merged),clust_label))
-    }else{
+    checkpoint <- sum(lsa::cosine(spectrum.df)>cos.merge)-ncol(spectrum.df)
+
+    if(checkpoint == 0){
       break
     }
-
   }
-  #dataframe.merged <- dataframe.merged[,order(colSums(dataframe.merged),decreasing=T)]
-  #stats.dataframe.merged <- stats.dataframe.merged[order(colSums(dataframe.merged),decreasing=T)]
 
-  high.confident.spectrum <- dataframe.merged[,which(stats.dataframe.merged>=(0.9*nsamp))]
-  high.confident.stats <- stats.dataframe.merged[which(stats.dataframe.merged>=(0.9*nsamp))]
-
-  moderate.spectrum <- dataframe.merged[,intersect(which(stats.dataframe.merged>=(0.1*nsamp)),which(stats.dataframe.merged<(0.9*nsamp)))]
-  moderate.stats <- stats.dataframe.merged[intersect(which(stats.dataframe.merged>=(0.1*nsamp)),which(stats.dataframe.merged<(0.9*nsamp)))]
+  ##############################################################
 
 
+  high.confident.spectrum <- spectrum.df[,which(spectrum.stats>=(0.9*nsamp))]
+  high.confident.stats <- spectrum.stats[which(spectrum.stats>=(0.9*nsamp))]
 
+  moderate.spectrum <- spectrum.df[,intersect(which(spectrum.stats>=(0.1*nsamp)),which(spectrum.stats<(0.9*nsamp)))]
+  moderate.stats <- spectrum.stats[intersect(which(spectrum.stats>=(0.1*nsamp)),which(spectrum.stats<(0.9*nsamp)))]
 
-  noise.spectrum <- dataframe.merged[,which(stats.dataframe.merged<(nsamp/nch))]
-  noise.stats <- stats.dataframe.merged[which(stats.dataframe.merged<(nsamp/nch))]
+  noise.spectrum <- spectrum.df[,which(spectrum.stats<(0.1*nsamp))]
+  noise.stats <- spectrum.stats[which(spectrum.stats<(0.1*nsamp))]
 
 
 
