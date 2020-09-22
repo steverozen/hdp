@@ -365,7 +365,7 @@ mo_plot_sig_exposure_for_dp <- function(retval, hdpsample, input.catalog,
 
     on.exit(par(this.par))
 
-    beeswarm::beeswarm(Exposure~Tumor,data=sig.df,method="swarm",col=1:3, pch=19, cex=.75)
+    #beeswarm::beeswarm(Exposure~Tumor,data=sig.df,method="swarm",col=1:3, pch=19, cex=.75)
 
 
     old.par <- par(mfrow = c(6, 1), mar = c(2, 2, 2, 2), oma = c(2, 2, 2, 2))

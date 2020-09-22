@@ -6,23 +6,25 @@
 #'
 #' ccc_0 and cdc_0 are for diagnostic checking and exposure summary
 #'
-#' @param x hdpSampleChain or hdpSampleMulti object
-#' @param cos.merge Merge components with cosine similarity above this threshold (default 0.90)
-#' @param confident.prop a numeric between 0.1 and 1. A cluster with                             confident.prop of total posterior samples will                          be determiend as high confident signature
+#' @param x \code{hdpSampleChain} or \code{hdpSampleMulti} object
+#' @param cos.merge Merge components with cosine similarity above this threshold (default 0.90).
+#' @param confident.prop a numeric between 0.1 and 1. A cluster with more than                           confident.prop of total posterior samples will be determined as high                    confident signature
+#' @param noise.prop a numeric between 0.1 and 1. A cluster with less than                    noise.prop of total posterior samples will be determined as noise signature
 #'
 #' @return A hdpSampleChain or hdpSampleMulti object updated with component information
 #' @aliases extract_sigs_from_clusters
 #' @seealso \code{\link{hdp_posterior}}, \code{\link{hdp_multi_chain}},
 #'  \code{\link{plot_comp_size}}, \code{\link{plot_comp_distn}},
 #'  \code{\link{plot_dp_comp_exposure}}
-#' @importFrom stats cutree
+#' @importFrom stats cutree aggregate
 
 #' @export
 
 
 extract_sigs_from_clusters <-  function(x,
                                         cos.merge = 0.90,
-                                        confident.prop = 0.9){
+                                        confident.prop = 0.9,
+                                        noise.prop = 0.5){
   if (class(x)=="hdpSampleChain") {
     message('Extracting components on single chain.A hdpSampleMulti object is recommended, see ?hdp_multi_chain')
     is_multi <- FALSE
@@ -166,7 +168,7 @@ extract_sigs_from_clusters <-  function(x,
     stats.dataframe <- rbind(stats.dataframe,summary[[i]]$stats)
 
   }
-  #dataframe <- dataframe[,stats.dataframe$Freq>1]##exclude spectrum that only extracted in 1 post sample in a chain
+  #dataframe <- dataframe[,stats.dataframe$Freq>1]##exclude spectrum that only extracted in 1 post sample in a chain, too many noisy clusters affect the final extraction
   #stats.dataframe <- stats.dataframe[stats.dataframe$Freq>1,]
 
   dataframe.normed <- apply(dataframe,2,function(x)x/sum(x))
@@ -175,36 +177,49 @@ extract_sigs_from_clusters <-  function(x,
 
   ####decide best cutoff##########################################
   #####cut hc tree until no clusters have cos.sim > cos.cutoff####
-  for(h.cutoff in seq(0.01,max(cosine.dist.hctree$height),0.01)){
 
-    clusters <- cutree(cosine.dist.hctree,  h=h.cutoff)
-    spectrum.df <- matrix(ncol=0,nrow=nrow(dataframe.normed))
-    spectrum.stats <- {}
-      for(i in 1:length(unique(clusters))){
-        subindex <- which(clusters==i)
+  clusters <- cutree(cosine.dist.hctree,  h=0.05) #make sure each cluster is clean
+  spectrum.df <- t(aggregate(t(dataframe),by=list(clusters),sum))
+  spectrum.stats <- aggregate(stats.dataframe[,2],by=list(clusters),sum)
+  spectrum.df <- spectrum.df[-1,]
 
-        spectrum.df <- cbind(spectrum.df,rowSums(dataframe[,subindex,drop=FALSE]))
-        spectrum.stats <- c(spectrum.stats,sum(stats.dataframe[subindex,2]))
 
-      }
-    checkpoint <- sum(lsa::cosine(spectrum.df)>cos.merge)-ncol(spectrum.df)
 
-    if(checkpoint == 0){
+  for(iter.index in 1:15){
+
+    clust_cos <- cosCpp(as.matrix(spectrum.df))
+    clust_label <- c(1:ncol(spectrum.df))
+    colnames(spectrum.df) <- clust_label
+    clust_same <- (clust_cos > cos.merge & lower.tri(clust_cos))
+    same <- which(clust_same, arr.ind=TRUE) # merge these columns
+    if(length(same)==0){
+      message("no more merging")
       break
+    }else{
+      message("extra merging")
+      for (i in 1:nrow(same)){
+        clust_label[same[i, 1]] <- clust_label[same[i, 2]]
+      }
+      #remove(i)
+      spectrum.df <- merge_cols(spectrum.df,clust_label)
+      spectrum.stats <- aggregate(spectrum.stats[,2],by=list(clust_label),sum)
+
     }
+    # update clust_label vector to reflect the merging of columns.
+
   }
 
   ##############################################################
 
 
-  high.confident.spectrum <- spectrum.df[,which(spectrum.stats>=(confident.prop*nsamp))]
-  high.confident.stats <- spectrum.stats[which(spectrum.stats>=(confident.prop*nsamp))]
+  high.confident.spectrum <- spectrum.df[,which(spectrum.stats[,2]>=(confident.prop*nsamp))]
+  high.confident.stats <- spectrum.stats[which(spectrum.stats[,2]>=(confident.prop*nsamp)),]
 
-  moderate.spectrum <- spectrum.df[,intersect(which(spectrum.stats>=(0.1*nsamp)),which(spectrum.stats<(confident.prop*nsamp)))]
-  moderate.stats <- spectrum.stats[intersect(which(spectrum.stats>=(0.1*nsamp)),which(spectrum.stats<(confident.prop*nsamp)))]
+  moderate.spectrum <- spectrum.df[,intersect(which(spectrum.stats[,2]>=(noise.prop*nsamp)),which(spectrum.stats[,2]<(confident.prop*nsamp)))]
+  moderate.stats <- spectrum.stats[intersect(which(spectrum.stats[,2]>=(noise.prop*nsamp)),which(spectrum.stats[,2]<(confident.prop*nsamp))),]
 
-  noise.spectrum <- spectrum.df[,which(spectrum.stats<(0.1*nsamp))]
-  noise.stats <- spectrum.stats[which(spectrum.stats<(0.1*nsamp))]
+  noise.spectrum <- spectrum.df[,which(spectrum.stats[,2]<(noise.prop*nsamp))]
+  noise.stats <- spectrum.stats[which(spectrum.stats[,2]<(noise.prop*nsamp)),]
 
 
 

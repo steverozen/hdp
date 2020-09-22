@@ -8,14 +8,21 @@ This returns clusters with high confidence -extracted by more than 90% posterior
                            noise - less than number of post.samples on one chain
 and they are found in how many post.samples in 'stats'}
 \usage{
-extract_sigs_from_clusters(x, cos.merge = 0.9, confident.prop = 0.9)
+extract_sigs_from_clusters(
+  x,
+  cos.merge = 0.9,
+  confident.prop = 0.9,
+  noise.prop = 0.5
+)
 }
 \arguments{
-\item{x}{hdpSampleChain or hdpSampleMulti object}
+\item{x}{\code{hdpSampleChain} or \code{hdpSampleMulti} object}
 
-\item{cos.merge}{Merge components with cosine similarity above this threshold (default 0.90)}
+\item{cos.merge}{Merge components with cosine similarity above this threshold (default 0.90).}
 
-\item{confident.prop}{a numeric between 0.1 and 1. A cluster with                             confident.prop of total posterior samples will                          be determiend as high confident signature}
+\item{confident.prop}{a numeric between 0.1 and 1. A cluster with more than                           confident.prop of total posterior samples will be determined as high                    confident signature}
+
+\item{noise.prop}{a numeric between 0.1 and 1. A cluster with less than                    noise.prop of total posterior samples will be determined as noise signature}
 }
 \value{
 A hdpSampleChain or hdpSampleMulti object updated with component information
