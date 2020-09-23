@@ -7,7 +7,7 @@ R pkg for Hierarchical Dirichlet Process
 To install, first ensure `devtools` package is installed and the BioConductor repositories are available (run `setRepositories()`). 
 It might take a few minutes to download any missing dependencies and build the vignettes. 
 ```R
-devtools::install_github("nicolaroberts/hdp", build_vignettes = TRUE)
+devtools::install_github("steverozen/hdpx")
 ```
 
 For tutorials, see `browseVignettes("hdp")`.
