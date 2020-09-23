@@ -373,7 +373,12 @@ mo_plot_sig_exposure_for_dp <- function(retval, hdpsample, input.catalog,
 
     ICAMS::PlotCatalog(ICAMS::as.catalog(ccc_mean_df[,i,drop=FALSE],infer.rownames = T,catalog.type = "counts.signature"))
 
+    this.catalog <- input.catalog[,dp_order_sig[1:5], drop=FALSE]
+    this.prop <- exposures[i,dp_order_sig[1:5]]
+    this.prop <- round(this.prop,3)
+    colnames(this.catalog) <- paste0(colnames(this.catalog),"(",this.prop,")")
     for (j in 1:5) {
+
       ICAMS::PlotCatalog(ICAMS::as.catalog(input.catalog[,dp_order_sig[j], drop=FALSE]))
     }
 
