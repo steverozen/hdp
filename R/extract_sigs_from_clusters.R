@@ -178,7 +178,7 @@ extract_sigs_from_clusters <-  function(x,
   ####decide best cutoff##########################################
   #####cut hc tree until no clusters have cos.sim > cos.cutoff####
 
-  clusters <- cutree(cosine.dist.hctree,  h=0.05) #make sure each cluster is clean
+  clusters <- cutree(cosine.dist.hctree,  h=(1-cos.merge)) #make sure each cluster is clean
   spectrum.df <- t(aggregate(t(dataframe),by=list(clusters),sum))
   spectrum.stats <- aggregate(stats.dataframe[,2],by=list(clusters),sum)
   spectrum.df <- spectrum.df[-1,]
@@ -193,10 +193,10 @@ extract_sigs_from_clusters <-  function(x,
     clust_same <- (clust_cos > cos.merge & lower.tri(clust_cos))
     same <- which(clust_same, arr.ind=TRUE) # merge these columns
     if(length(same)==0){
-      message("no more merging")
+      #message("no more merging")
       break
     }else{
-      message("extra merging")
+      #message("extra merging")
       for (i in 1:nrow(same)){
         clust_label[same[i, 1]] <- clust_label[same[i, 2]]
       }
