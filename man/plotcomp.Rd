@@ -5,8 +5,6 @@
 \alias{plot_comp_size}
 \alias{plot_comp_distn}
 \alias{plot_dp_comp_exposure}
-\alias{plot_pca_sigs_tumortype}
-\alias{plot_tsne_sigs_tumortype}
 \title{Plot extracted components}
 \usage{
 plot_comp_size(
@@ -54,10 +52,6 @@ plot_dp_comp_exposure(
   oma = c(1.5, 1.5, 1, 1),
   ...
 )
-
-plot_pca_sigs_tumortype(exposure, colorcategory = NULL)
-
-plot_tsne_sigs_tumortype(exposure, colorcategory = NULL)
 }
 \arguments{
 \item{hdpsample}{A hdpSampleChain or hdpSampleMulti object including output
@@ -133,18 +127,9 @@ be included (per DP)? (Default TRUE)}
 \item{mar}{See ?par}
 
 \item{oma}{See ?par}
-
-\item{exposure}{An exposure matrix}
-
-\item{colorcategory}{A list of category of samples for labelling tsne plot.
-Length is equal as number of samples}
 }
 \description{
 Plot extracted components
 
 Plot hdp signature exposure in each sample
-
-A pca plot for signatures and tumors
-
-A tsne plot for signatures and tumors
 }
