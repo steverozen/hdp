@@ -1,20 +1,15 @@
-language: r
-warnings_are_errors: false
+# R for travis: see documentation at https://docs.travis-ci.com/user/languages/r
+
+language: R
 sudo: required
+cache: packages
 
 r:
   - oldrel
   - release
   - devel
 
-r_packages:
-  - devtools
-bioc_packages:
-  - BiocStyle
+before_install:
+  - sudo apt-get update
 
-env:
-  global:
-    - CRAN=http://cran.rstudio.com
-    - NOT_CRAN=true
-    - _R_CHECK_CRAN_INCOMING_=false
-    - _R_CHECK_FORCE_SUGGESTS_=false
+warnings_are_errors: false

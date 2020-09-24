@@ -1,13 +1,13 @@
-# hdp
+# hdpx
 R pkg for Hierarchical Dirichlet Process
 
-[![Build Status](https://travis-ci.org/nicolaroberts/hdp.svg?branch=master)](https://travis-ci.org/nicolaroberts/hdp)
+[![Build Status](https://travis-ci.com/steverozen/hdpx.svg?branch=v0.1.7-branch)](https://travis-ci.com/steverozen/hdpx)
 
 
-To install, first ensure `devtools` package is installed and the BioConductor repositories are available (run `setRepositories()`). 
+To install, first ensure `remotes` package is installed and the BioConductor repositories are available (run `setRepositories()`). 
 It might take a few minutes to download any missing dependencies and build the vignettes. 
 ```R
-devtools::install_github("steverozen/hdpx")
+remotes::install_github(repo = "steverozen/hdpx", ref = "v0.1.7-branch", build_vignettes = FALSE)
 ```
 
 Works on MacOS and Linux, but may not install on Windows. 
