@@ -8,20 +8,7 @@ Authors@R: c(person("Steve", "Rozen", email="steverozen@gmail.com", role="aut"),
 Encoding: UTF-8
 Depends:
     R(>= 3.5.0)
-Imports:
-    lsa,
-    methods,
-    flexclust,
-    coda,
-    clue,
-    Matrix,
-    ggplot2,
-    ICAMS,
-    reshape2,
-    stats,
-    beeswarm,
-    Rcpp,
-    RcppArmadillo
+biocViews:
 LazyData: true
 Language: en-US
 Description: Model categorical count data with a hierarchical Dirichlet
@@ -36,6 +23,20 @@ Description: Model categorical count data with a hierarchical Dirichlet
 License: file LICENSE
 URL: https://github.com/steverozen/hdpx
 BugReports: https://github.com/steverozen/hdpx/issues
+Imports:
+    lsa,
+    methods,
+    flexclust,
+    coda,
+    clue,
+    Matrix,
+    ggplot2,
+    ICAMS,
+    reshape2,
+    stats,
+    beeswarm,
+    Rcpp,
+    RcppArmadillo
 Suggests:
     testthat,
     RColorBrewer,
