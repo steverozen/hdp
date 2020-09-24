@@ -8,6 +8,7 @@ Authors@R: c(person("Steve", "Rozen", email="steverozen@gmail.com", role="aut"),
 Encoding: UTF-8
 Depends:
     R(>= 3.5.0)
+biocViews:
 Imports:
     lsa,
     methods,
