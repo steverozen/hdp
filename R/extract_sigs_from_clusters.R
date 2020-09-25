@@ -1,16 +1,11 @@
 #' This function extract signatures from raw clusters discovered by hdp.
-#' This returns clusters with high confidence -extracted by more than 90% posterior samples;
-#'                            moderate confidence - extracted less than 90% but more than number of post.samples on one chain
-#'                            noise - less than number of post.samples on one chain
-#' and they are found in how many post.samples in 'stats'
+#' This returns clusters with the number of posterior samples that they belong
 #'
 #' ccc_0 and cdc_0 are for diagnostic checking and exposure summary
 #'
 #' @param x \code{hdpSampleChain} or \code{hdpSampleMulti} object
 #' @param cos.merge Merge components with cosine similarity above this threshold (default 0.90).
-#' @param confident.prop a numeric between 0.1 and 1. A cluster with more than                           confident.prop of total posterior samples will be determined as high                    confident signature
-#' @param noise.prop a numeric between 0.1 and 1. A cluster with less than                    noise.prop of total posterior samples will be determined as noise signature
-#'
+#' @param hc.cutoff the height to cut hierarchcial clustering tree
 #' @return A hdpSampleChain or hdpSampleMulti object updated with component information
 #' @aliases extract_sigs_from_clusters
 #' @seealso \code{\link{hdp_posterior}}, \code{\link{hdp_multi_chain}},
@@ -23,8 +18,8 @@
 
 extract_sigs_from_clusters <-  function(x,
                                         cos.merge = 0.90,
-                                        confident.prop = 0.9,
-                                        noise.prop = 0.5){
+                                        hc.cutoff = 0.12
+                                      ){
   if (class(x)=="hdpSampleChain") {
     message('Extracting components on single chain.A hdpSampleMulti object is recommended, see ?hdp_multi_chain')
     is_multi <- FALSE
@@ -173,12 +168,12 @@ extract_sigs_from_clusters <-  function(x,
 
   dataframe.normed <- apply(dataframe,2,function(x)x/sum(x))
   cosine.dist.df <- parallelDist::parallelDist(t(dataframe.normed),method = "cosine")
-  cosine.dist.hctree <- stats::hclust(cosine.dist.df)
+  cosine.dist.hctree <- stats::hclust(cosine.dist.df,method = "average")
 
   ####decide best cutoff##########################################
   #####cut hc tree until no clusters have cos.sim > cos.cutoff####
 
-  clusters <- cutree(cosine.dist.hctree,  h=(1-cos.merge)) #make sure each cluster is clean
+  clusters <- cutree(cosine.dist.hctree,  h=hc.cutoff) #make sure each cluster is clean
   spectrum.df <- t(aggregate(t(dataframe),by=list(clusters),sum))
   spectrum.stats <- aggregate(stats.dataframe[,2],by=list(clusters),sum)
   spectrum.df <- spectrum.df[-1,]
@@ -209,27 +204,10 @@ extract_sigs_from_clusters <-  function(x,
 
   }
 
-  ##############################################################
-
-
-  high.confident.spectrum <- spectrum.df[,which(spectrum.stats[,2]>=(confident.prop*nsamp))]
-  high.confident.stats <- spectrum.stats[which(spectrum.stats[,2]>=(confident.prop*nsamp)),]
-
-  moderate.spectrum <- spectrum.df[,intersect(which(spectrum.stats[,2]>=(noise.prop*nsamp)),which(spectrum.stats[,2]<(confident.prop*nsamp)))]
-  moderate.stats <- spectrum.stats[intersect(which(spectrum.stats[,2]>=(noise.prop*nsamp)),which(spectrum.stats[,2]<(confident.prop*nsamp))),]
-
-  noise.spectrum <- spectrum.df[,which(spectrum.stats[,2]<(noise.prop*nsamp))]
-  noise.stats <- spectrum.stats[which(spectrum.stats[,2]<(noise.prop*nsamp)),]
-
-
-
-  return(invisible(list(high.confident.spectrum = high.confident.spectrum,
-                        high.confident.stats    = high.confident.stats,
-                        moderate.spectrum = moderate.spectrum,
-                        moderate.stats    = moderate.stats,
-                        noise.spectrum = noise.spectrum,
-                        noise.stats    = noise.stats,
+  return(invisible(list(clustered.spectrum = spectrum.df,
+                        stats.post.samples = spectrum.stats,
                         ccc_0 = ccc_0,
                         cdc_0 = cdc_0,
-                        multi.chains = x)))
+                        multi.chains = x,
+                        nsamp = nsamp)))
 }

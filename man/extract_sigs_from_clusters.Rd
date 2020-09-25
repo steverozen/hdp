@@ -3,26 +3,16 @@
 \name{extract_sigs_from_clusters}
 \alias{extract_sigs_from_clusters}
 \title{This function extract signatures from raw clusters discovered by hdp.
-This returns clusters with high confidence -extracted by more than 90% posterior samples;
-                           moderate confidence - extracted less than 90% but more than number of post.samples on one chain
-                           noise - less than number of post.samples on one chain
-and they are found in how many post.samples in 'stats'}
+This returns clusters with the number of posterior samples that they belong}
 \usage{
-extract_sigs_from_clusters(
-  x,
-  cos.merge = 0.9,
-  confident.prop = 0.9,
-  noise.prop = 0.5
-)
+extract_sigs_from_clusters(x, cos.merge = 0.9, hc.cutoff = 0.12)
 }
 \arguments{
 \item{x}{\code{hdpSampleChain} or \code{hdpSampleMulti} object}
 
 \item{cos.merge}{Merge components with cosine similarity above this threshold (default 0.90).}
 
-\item{confident.prop}{a numeric between 0.1 and 1. A cluster with more than                           confident.prop of total posterior samples will be determined as high                    confident signature}
-
-\item{noise.prop}{a numeric between 0.1 and 1. A cluster with less than                    noise.prop of total posterior samples will be determined as noise signature}
+\item{hc.cutoff}{the height to cut hierarchcial clustering tree}
 }
 \value{
 A hdpSampleChain or hdpSampleMulti object updated with component information

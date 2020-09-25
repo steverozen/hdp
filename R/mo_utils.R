@@ -44,13 +44,9 @@ extract_ccc_cdc_from_hdp <- function(spectrum,
     ccc_unlist <- do.call(cbind,ccc_0[[chain]])
     cdc_unlist <- do.call(cbind,cdc_0[[chain]])
 
-    for(i in 1:ncol(ccc_unlist)){
-      if(lsa::cosine(ccc_unlist[,i],spectrum)>=cos.merge){
-        spectrum.ccc <- cbind(spectrum.ccc,ccc_unlist[,i])
-        spectrum.cdc <- cbind(spectrum.cdc,cdc_unlist[,i])
-      }
-    }
-
+    cos.sims <- apply(ccc_unlist,2,function(x){lsa::cosine(x,spectrum)})
+    spectrum.ccc <- cbind(spectrum.ccc,ccc_unlist[,cos.sims>cos.merge])
+    spectrum.cdc <- cbind(spectrum.cdc,cdc_unlist[,cos.sims>cos.merge])
 
   }
 
