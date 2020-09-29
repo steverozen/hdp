@@ -326,9 +326,12 @@ mo_plot_sig_exposure_for_dp <- function(retval, hdpsample, input.catalog,
 
   data.exposures <- t(numdata*t(exposures))
   colnames(data.exposures) <- colnames(input.catalog)
-  row.names(data.exposures) <- paste0("hdp.",c(1:nrow(data.exposures)))
+  row.names(data.exposures) <- names(retval)
+  numdata.cutoff <- 0.5*nrow(input.catalog)
+  data.exposures <- data.exposures[,which(colSums(data.exposures)>numdata.cutoff)]##exclude extremely low samples
 
-  barplot(rowSums(data.exposures))
+  x <- barplot(rowSums(data.exposures), las=2,cex.names = 0.8) # Do not plot any axes
+
 
   Signature <- Sample <- Exposure <- Tumor <- NULL
 
@@ -357,12 +360,14 @@ mo_plot_sig_exposure_for_dp <- function(retval, hdpsample, input.catalog,
 
     plot(exposures[i,]~data.exposures[i,],xlab="Exposure",ylab="Prop.Exposure",main=sig,pch=16)
 
-    sig.df <- df[df$Signature==sig,]
+    #sig.df <- df[df$Signature==sig,]
 
     on.exit(par(this.par))
 
+    #sig.df$exp.prop <- as.numeric(exposures[i,])
     #beeswarm::beeswarm(Exposure~Tumor,data=sig.df,method="swarm",col=1:3, pch=19, cex=.75)
-
+    #ggplot2::ggplot(data=sig.df, aes(x=Tumor, y=exp.prop)) +
+    #  ggplot2::geom_bar(stat="identity")+ ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 90, vjust = 0.5, hjust=1))
 
     old.par <- par(mfrow = c(6, 1), mar = c(2, 2, 2, 2), oma = c(2, 2, 2, 2))
     on.exit(par(old.par))
@@ -375,7 +380,7 @@ mo_plot_sig_exposure_for_dp <- function(retval, hdpsample, input.catalog,
     colnames(this.catalog) <- paste0(colnames(this.catalog),"(",this.prop,")")
     for (j in 1:5) {
 
-      ICAMS::PlotCatalog(ICAMS::as.catalog(input.catalog[,dp_order_sig[j], drop=FALSE]))
+      ICAMS::PlotCatalog(this.catalog[,j, drop=FALSE])
     }
 
 
