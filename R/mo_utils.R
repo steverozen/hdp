@@ -330,6 +330,7 @@ mo_plot_sig_exposure_for_dp <- function(retval, hdpsample, input.catalog,
   numdata.cutoff <- 0.5*nrow(input.catalog)
   data.exposures <- data.exposures[,which(colSums(data.exposures)>numdata.cutoff)]##exclude extremely low samples
   exposures <- exposures[,which(colSums(data.exposures)>numdata.cutoff)]
+  input.catalog <- input.catalog[,which(colSums(data.exposures)>numdata.cutoff)]
   x <- barplot(rowSums(data.exposures), las=2,cex.names = 0.8) # Do not plot any axes
 
 
