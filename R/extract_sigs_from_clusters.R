@@ -132,12 +132,14 @@ extract_sigs_from_clusters <-  function(x,
   #######merge clusters with high cos.sim in one posterior chain##########
   ########################################################################
 
-  cosmergechain <- function(ccc){
-    ccc_unlist <- do.call(cbind,ccc)
-    test <- cosCpp(as.matrix(ccc_unlist))
+
+  cosmergechain <- function(ccc,cdc){
+
+    test <- cosCpp(as.matrix(ccc))
     clust_cos <- test
-    clust_label <- c(1:ncol(ccc_unlist))
-    colnames(ccc_unlist) <- clust_label
+    clust_label <- c(1:ncol(ccc))
+    colnames(ccc) <- clust_label
+    colnames(cdc) <- clust_label
 
 
     clust_same <- (clust_cos > 0.99 & lower.tri(clust_cos))
@@ -147,19 +149,26 @@ extract_sigs_from_clusters <-  function(x,
         clust_label[same[index, 1]] <- clust_label[same[index, 2]]
       }
     }
-    ccc_unlist <- data.frame(merge_cols(as.matrix(ccc_unlist),clust_label))
-    summary <- c(summary,list(spectrum = ccc_unlist,
-                              stats    = data.frame(table(clust_label))))
+    ccc_unlist <- data.frame(merge_cols(as.matrix(ccc),clust_label))
+    cdc_unlist <- data.frame(merge_cols(as.matrix(cdc),clust_label))
+    return(list= list(spectrum = ccc_unlist,
+                      spectrum_cdc = cdc_unlist,
+                      stats    = data.frame(table(clust_label))))
 
   }
 
-  summary <- lapply(ccc_0,cosmergechain)
+  for(i in 1:length(ccc_0)){
+    ccc_0[[i]] <-  do.call(cbind,ccc_0[[i]])
+    cdc_0[[i]] <- do.call(cbind,cdc_0[[i]])
+  }
+  summary <- mapply(cosmergechain,ccc_0,cdc_0,SIMPLIFY = F)
 
   dataframe <- data.frame(matrix(nrow=ncat,ncol=0))
   stats.dataframe <- data.frame(matrix(nrow=0,ncol=2))
-
+  dp.dataframe <- data.frame(matrix(nrow=ndp,ncol=0))
   for(i in 1:nch){
     dataframe <- cbind(dataframe,summary[[i]]$spectrum)
+    dp.dataframe <- cbind(dp.dataframe,summary[[i]]$spectrum_cdc)
     stats.dataframe <- rbind(stats.dataframe,summary[[i]]$stats)
 
   }
@@ -174,17 +183,17 @@ extract_sigs_from_clusters <-  function(x,
   #####cut hc tree until no clusters have cos.sim > cos.cutoff####
 
   clusters <- cutree(cosine.dist.hctree,  h=hc.cutoff) #make sure each cluster is clean
-  spectrum.df <- t(aggregate(t(dataframe),by=list(clusters),sum))
+  spectrum.df <- merge_cols(as.matrix(dataframe),clusters)
   spectrum.stats <- aggregate(stats.dataframe[,2],by=list(clusters),sum)
-  spectrum.df <- spectrum.df[-1,]
-
+  spectrum.cdc <- merge_cols(as.matrix(dp.dataframe),clusters)
 
 
   for(iter.index in 1:15){
 
     clust_cos <- cosCpp(as.matrix(spectrum.df))
     clust_label <- c(1:ncol(spectrum.df))
-    colnames(spectrum.df) <- clust_label
+    colnames(spectrum.df) <- c(1:ncol(spectrum.df))
+    colnames(spectrum.cdc) <- c(1:ncol(spectrum.df))
     clust_same <- (clust_cos > cos.merge & lower.tri(clust_cos))
     same <- which(clust_same, arr.ind=TRUE) # merge these columns
     if(length(same)==0){
@@ -196,18 +205,18 @@ extract_sigs_from_clusters <-  function(x,
         clust_label[same[i, 1]] <- clust_label[same[i, 2]]
       }
       #remove(i)
-      spectrum.df <- merge_cols(spectrum.df,clust_label)
+      spectrum.df <- merge_cols(as.matrix(spectrum.df),clust_label)
       spectrum.stats <- aggregate(spectrum.stats[,2],by=list(clust_label),sum)
-
+      spectrum.cdc <- merge_cols(as.matrix(spectrum.cdc),clust_label)
     }
     # update clust_label vector to reflect the merging of columns.
+
 
   }
 
   return(invisible(list(clustered.spectrum = spectrum.df,
                         stats.post.samples = spectrum.stats,
-                        ccc_0 = ccc_0,
-                        cdc_0 = cdc_0,
+                        spectrum.cdc = spectrum.cdc,
                         multi.chains = x,
                         nsamp = nsamp)))
 }

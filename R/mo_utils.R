@@ -224,11 +224,10 @@ mo_plot_sig_exposure_for_dp <- function(retval, hdpsample, input.catalog,
                                         oma=c(1.5, 1.5, 1, 1), ...){
 
   # input checks
-  exposure_mean_df <- do.call(cbind,lapply(retval,function(x)x[["cdc_mean"]]))
-  exposure_mean_df <- t(apply(exposure_mean_df,1,function(x){x/sum(x)}))
-  cdc_credint <- lapply(retval,function(x)x[["cdc_credint"]])
-  ccc_mean_df <- do.call(cbind,lapply(retval,function(x)x[["ccc_mean"]]))
-  row.names(ccc_mean_df) <- NULL
+
+  exposures <- retval$exposure
+
+  ccc_mean_df <- retval$signature
 
   ndp <- hdpsample@chains[[1]]@hdp@numdp
   ncomp <- ncol(ccc_mean_df)
@@ -281,15 +280,6 @@ mo_plot_sig_exposure_for_dp <- function(retval, hdpsample, input.catalog,
             separate plots may be better")
   }
 
-  # mean exposures
-  if(ndp > nrow(exposure_mean_df)){
-    exposures <- t(exposure_mean_df[1:length(dpnames),,drop=FALSE])
-  }else{
-    exposures <- t(exposure_mean_df[dpindices,,drop=FALSE])
-  }
-
-
-
   # which components to include in this plot
   inc <- which(rowSums(exposures, na.rm=T)>0)
 
@@ -326,7 +316,7 @@ mo_plot_sig_exposure_for_dp <- function(retval, hdpsample, input.catalog,
 
   data.exposures <- t(numdata*t(exposures))
   colnames(data.exposures) <- colnames(input.catalog)
-  row.names(data.exposures) <- names(retval)
+  row.names(data.exposures) <- colnames(retval$signature)
   numdata.cutoff <- 0.5*nrow(input.catalog)
   data.exposures <- data.exposures[,which(colSums(input.catalog)>numdata.cutoff)]##exclude extremely low samples
   exposures <- exposures[,which(colSums(input.catalog)>numdata.cutoff)]
