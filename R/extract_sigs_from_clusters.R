@@ -114,15 +114,13 @@ extract_sigs_from_clusters <-  function(x,
   }
 
 
-  for(i in 1:length(ccc_0)){
+  for(i in 1:nch){
 
-    len <- length(ccc_0[[i]])
+    test <- mapply(first.merge,ccc_0[[i]],cdc_0[[i]],SIMPLIFY = F)
 
-    test <- mapply(first.merge,ccc_0[[i]],cdc_0[[i]])
-
-    for(j in 1:len){
-      ccc_0[[i]][[j]] <- test[[(2*j)-1]]
-      cdc_0[[i]][[j]] <- test[[2*j]]
+    for(j in 1:length(ccc_0[[i]])){
+      ccc_0[[i]][[j]] <- test[[j]]$ccc
+      cdc_0[[i]][[j]] <- test[[j]]$cdc
     }
 
 
@@ -134,13 +132,10 @@ extract_sigs_from_clusters <-  function(x,
 
 
   cosmergechain <- function(ccc,cdc){
-
-    test <- cosCpp(as.matrix(ccc))
-    clust_cos <- test
+    clust_cos <- cosCpp(as.matrix(ccc))
     clust_label <- c(1:ncol(ccc))
-    colnames(ccc) <- clust_label
-    colnames(cdc) <- clust_label
 
+    colnames(ccc) <- colnames(cdc) <- clust_label
 
     clust_same <- (clust_cos > 0.99 & lower.tri(clust_cos))
     same <- which(clust_same, arr.ind=TRUE) # merge these columns
@@ -149,29 +144,48 @@ extract_sigs_from_clusters <-  function(x,
         clust_label[same[index, 1]] <- clust_label[same[index, 2]]
       }
     }
-    ccc_unlist <- data.frame(merge_cols(as.matrix(ccc),clust_label))
-    cdc_unlist <- data.frame(merge_cols(as.matrix(cdc),clust_label))
-    return(list= list(spectrum = ccc_unlist,
-                      spectrum_cdc = cdc_unlist,
-                      stats    = data.frame(table(clust_label))))
+
+
+    ccc_unlist <- merge_cols(as.matrix(ccc),clust_label)
+    cdc_unlist <- merge_cols(as.matrix(cdc),clust_label)
+
+    stats <- data.frame(table(clust_label))
+
+    new.spectrum <- ccc_unlist[,which(stats$Freq>1)]
+    new.cdc <- cdc_unlist[,which(stats$Freq>1)]
+    new.stats <- stats[which(stats$Freq>1),]
+    noise.spectrum <- rowSums(ccc_unlist[,which(stats$Freq==1)])
+    noise.cdc <- rowSums(cdc_unlist[,which(stats$Freq==1)])
+    noise.stats <- sum(stats$Freq==1)
+    return(list= list(spectrum     = new.spectrum,
+                      spectrum_cdc = new.cdc,
+                      spectrum_stats = new.stats,
+                      noise.spectrum = noise.spectrum,
+                      noise.cdc    = noise.cdc,
+                      noise.stats  = noise.stats
+                      ))
 
   }
 
-  for(i in 1:length(ccc_0)){
+  for(i in 1:nch){
     ccc_0[[i]] <-  do.call(cbind,ccc_0[[i]])
     cdc_0[[i]] <- do.call(cbind,cdc_0[[i]])
   }
   summary <- mapply(cosmergechain,ccc_0,cdc_0,SIMPLIFY = F)
 
-  dataframe <- data.frame(matrix(nrow=ncat,ncol=0))
+  dataframe <- all.noise.spectrum <- data.frame(matrix(nrow=ncat,ncol=0))
   stats.dataframe <- data.frame(matrix(nrow=0,ncol=2))
-  dp.dataframe <- data.frame(matrix(nrow=ndp,ncol=0))
+  dp.dataframe <- each.chain.noise.cdc <- data.frame(matrix(nrow=ndp,ncol=0))
+
   for(i in 1:nch){
     dataframe <- cbind(dataframe,summary[[i]]$spectrum)
     dp.dataframe <- cbind(dp.dataframe,summary[[i]]$spectrum_cdc)
-    stats.dataframe <- rbind(stats.dataframe,summary[[i]]$stats)
-
+    stats.dataframe <- rbind(stats.dataframe,summary[[i]]$spectrum_stats)
+    each.chain.noise.spectrum <- cbind(all.noise.spectrum,summary[[i]]$noise.spectrum)
+    each.chain.noise.cdc <- cbind(each.chain.noise.cdc,summary[[i]]$noise.cdc)
   }
+
+
   #dataframe <- dataframe[,stats.dataframe$Freq>1]##exclude spectrum that only extracted in 1 post sample in a chain, too many noisy clusters affect the final extraction
   #stats.dataframe <- stats.dataframe[stats.dataframe$Freq>1,]
 
@@ -217,6 +231,10 @@ extract_sigs_from_clusters <-  function(x,
   return(invisible(list(clustered.spectrum = spectrum.df,
                         stats.post.samples = spectrum.stats,
                         spectrum.cdc = spectrum.cdc,
+                        each.chain.noise.cdc = each.chain.noise.cdc,  #noise from each chain
+
+                        each.chain.noise.spectrum = each.chain.noise.spectrum,  #noise from each chain
+
                         multi.chains = x,
                         nsamp = nsamp)))
 }
