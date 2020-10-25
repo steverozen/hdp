@@ -2,7 +2,7 @@
 % Please edit documentation in R/xmake.s.R
 \name{xmake.s}
 \alias{xmake.s}
-\title{Return a function to calculate the unsigned Stirling numbers of the first kind}
+\title{Return a function to calculate the unsigned Stirling numbers of the first kind.}
 \usage{
 xmake.s()
 }
@@ -21,5 +21,5 @@ package the
 function returned *must* be called \code{stir.closure}.
 }
 \description{
-Return a function to calculate the unsigned Stirling numbers of the first kind
+Return a function to calculate the unsigned Stirling numbers of the first kind.
 }

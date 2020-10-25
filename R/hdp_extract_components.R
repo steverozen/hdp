@@ -12,7 +12,7 @@
 #' @seealso \code{\link{hdp_posterior}}, \code{\link{hdp_multi_chain}},
 #'  \code{\link{plot_comp_size}}, \code{\link{plot_comp_distn}},
 #'  \code{\link{plot_dp_comp_exposure}}
-#' @import clue
+#'
 #' @export
 # @examples
 # hdp_extract_components(mut_example_multi)

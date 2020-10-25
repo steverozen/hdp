@@ -1,68 +1,4 @@
 
-#'find the ccc and cdc that matched to a spectrum in ccc_0 and cdc_0
-#'this function is to summarize the credint and mean of cccs and cdcs
-#'and for further exposure matrix
-#'@param spectrum signature spectrum for compare
-#'@param ccc_0 a list object contains clust_categ_counts matrix from hdp
-#'@param cdc_0 a list object contains clust_dp_counts matrix from hdp
-#'@param cos.merge cosine similarity cutoff
-#'
-#'@export
-
-maybe_not_used_extract_ccc_cdc_from_hdp <- function(spectrum,
-                                     ccc_0,
-                                     cdc_0,
-                                     cos.merge = 0.90){
-
-  spectrum.ccc <- data.frame(matrix(nrow=nrow(ccc_0[[1]][[1]]),ncol=0))
-  spectrum.cdc <- data.frame(matrix(nrow=nrow(cdc_0[[1]][[1]]),ncol=0))
-
-  for(chain in 1:length(ccc_0)){
-    ccc_unlist <- do.call(cbind,ccc_0[[chain]])
-    cdc_unlist <- do.call(cbind,cdc_0[[chain]])
-
-    cos.sims <- apply(ccc_unlist,2,function(x){lsa::cosine(x,spectrum)})
-    spectrum.ccc <- cbind(spectrum.ccc,ccc_unlist[,cos.sims>cos.merge])
-    spectrum.cdc <- cbind(spectrum.cdc,cdc_unlist[,cos.sims>cos.merge])
-
-  }
-
-  ccc_norm <- apply(spectrum.ccc, 2,function(x) x/sum(x, na.rm=TRUE))
-
-  ccc_mean <- rowMeans(ccc_norm)
-
-  ccc_credint <- apply(ccc_norm, 1, function(y) {
-    samp <- coda::as.mcmc(y)
-    if (min(sum(!is.na(samp)), sum(!is.nan(samp))) %in% c(0,1)) {
-      c(NaN, NaN)
-    } else {
-      round(coda::HPDinterval(samp, 0.95), 4)
-    }
-  })
-
-  # Calculate mean and 95% credibility interval for each component
-  # distribution over all dps (counts)
-  cdc_norm <- apply(spectrum.cdc, 2,function(x) x/sum(x, na.rm=TRUE))
-
-  cdc_mean <- rowMeans(spectrum.cdc)
-
-  cdc_credint <- apply(cdc_norm, 1, function(y) {
-    samp <- coda::as.mcmc(y)
-    if (min(sum(!is.na(samp)), sum(!is.nan(samp))) %in% c(0,1)) {
-      c(NaN, NaN)
-    } else {
-      round(coda::HPDinterval(samp, 0.95), 4)
-    }
-  })
-
-  return(invisible(list(spectrum.ccc = spectrum.ccc,
-                        spectrum.cdc = spectrum.cdc,
-                        ccc_mean = ccc_mean,
-                        ccc_credint = ccc_credint,
-                        cdc_mean = cdc_mean,
-                        cdc_credint = cdc_credint)))
-}
-
 #' Plot signatures and their 95\% credible intervals
 #'
 #' @param retval an object return from \code{\link{extract_ccc_cdc_from_hdp}}
@@ -142,7 +78,7 @@ plot_comp_distn_with_credint <-
     # main barplot
     b <- barplot(sig, col=cat_cols_copy, xaxt="n", ylim=c(0,plottop*1.1),
                  border=NA, names.arg=rep("", ncat), xpd=F, las=1,
-                 main=plot_title[ii],...)
+                 main=plot_title[ii])
 
     # add credibility intervals
     if (cred_int & !is.null(ci)){
@@ -154,9 +90,6 @@ plot_comp_distn_with_credint <-
       mtext(cat_names, side=1, las=2, at=b, cex=cex.cat,
             family="mono", col=cat_cols)
     }
-
-
-
   }
 }
 
@@ -352,7 +285,7 @@ plot_sig_exposure_for_dp <- function(retval, hdpsample, input.catalog,
 #' @importFrom ggplot2 ggplot geom_boxplot xlab ylab
 #'
 plot_num_mutations_per_comp <- function(retval, xlab="Component",
-                              ylab="Number of data items", ...){
+                              ylab="Number of data items"){
 
   # input checks
   sum.cccs <- lapply(retval, function(x){colSums(x[["spectrum.ccc"]])})##sums of exposures for each signature across all posterior samples
