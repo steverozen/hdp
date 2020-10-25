@@ -1,28 +1,4 @@
 
-
-#'label_based_on_cosine_similarity
-#'
-#'
-#'@param clust_label column names of the input matrix
-#'@param matrix the matrix needs to be measured
-#'@param cos.sim cosine similarity threshold
-#'
-#'@keywords  internal
-generate_label_high_cossim <- function(clust_label,
-                                       matrix,
-                                       cos.sim){
-  clust_cos <- cosCpp(as.matrix(matrix))
-  clust_same <- (clust_cos > cos.sim & lower.tri(clust_cos))
-  same <- which(clust_same, arr.ind=TRUE) # merge these columns
-  if (length(same)>0){
-    for (index in 1:nrow(same)){
-      clust_label[same[index, 1]] <- clust_label[same[index, 2]]
-    }
-  }
-  return(clust_label)
-}
-
-
 #'find the ccc and cdc that matched to a spectrum in ccc_0 and cdc_0
 #'this function is to summarize the credint and mean of cccs and cdcs
 #'and for further exposure matrix
@@ -32,7 +8,8 @@ generate_label_high_cossim <- function(clust_label,
 #'@param cos.merge cosine similarity cutoff
 #'
 #'@export
-extract_ccc_cdc_from_hdp <- function(spectrum,
+
+maybe_not_used_extract_ccc_cdc_from_hdp <- function(spectrum,
                                      ccc_0,
                                      cdc_0,
                                      cos.merge = 0.90){
@@ -63,7 +40,6 @@ extract_ccc_cdc_from_hdp <- function(spectrum,
     }
   })
 
-  # Step (8)
   # Calculate mean and 95% credibility interval for each component
   # distribution over all dps (counts)
   cdc_norm <- apply(spectrum.cdc, 2,function(x) x/sum(x, na.rm=TRUE))
@@ -79,23 +55,15 @@ extract_ccc_cdc_from_hdp <- function(spectrum,
     }
   })
 
-
   return(invisible(list(spectrum.ccc = spectrum.ccc,
                         spectrum.cdc = spectrum.cdc,
                         ccc_mean = ccc_mean,
                         ccc_credint = ccc_credint,
                         cdc_mean = cdc_mean,
                         cdc_credint = cdc_credint)))
-
-
 }
 
-#####################################################
-#####################################################
-####################################################
-
-
-#'This function plots signature with 95\% confidence interval
+#' Plot signatures and their 95\% credible intervals
 #'
 #' @param retval an object return from \code{\link{extract_ccc_cdc_from_hdp}}
 #' @param col Either a single colour for all data categories, or a vector of
@@ -107,27 +75,28 @@ extract_ccc_cdc_from_hdp <- function(spectrum,
 #' @param group_label_height Multiplicative factor from top of plot for group label placement
 #' @param cat_names names displayed on x-axis, e.g. SBS96 mutation classes
 #' @param cex.cat Expansion factor for the (optional) cat_names
-#' @param ... Other arguments to plot
+#'
 #' @export
 #'
-mo_plot_comp_distn_with_credint <- function(retval,cat_names=NULL,
-                                            col="grey70",
-                                            cred_int=TRUE,
-                                            weights=NULL,
-                                            group_label_height=1.05, cex.cat=0.7, ...){
+plot_comp_distn_with_credint <-
+  function(retval,cat_names=NULL,
+           col="grey70",
+           cred_int=TRUE,
+           weights=NULL,
+           group_label_height=1.05, cex.cat=0.7){
 
-  # input checks
-  ccc_mean_df <- do.call(cbind,lapply(retval,function(x)x[["ccc_mean"]]))
-  ccc_credint <- lapply(retval,function(x)x[["ccc_credint"]])
+    # input checks
+    ccc_mean_df <- do.call(cbind,lapply(retval,function(x)x[["ccc_mean"]]))
+    ccc_credint <- lapply(retval,function(x)x[["ccc_credint"]])
 
-  ncat <- nrow(ccc_mean_df)
+    ncat <- nrow(ccc_mean_df)
 
-  comp_distn <- ccc_mean_df
+    comp_distn <- ccc_mean_df
 
-  if(class(cred_int) != "logical") stop("cred_int must be TRUE or FALSE")
-  if(!class(weights) %in% c("numeric", "NULL") |
-     !length(weights) %in% c(ncat, 0)) {
-    stop("weights must be a numeric vector with one value for every
+    if(class(cred_int) != "logical") stop("cred_int must be TRUE or FALSE")
+    if(!class(weights) %in% c("numeric", "NULL") |
+       !length(weights) %in% c(ncat, 0)) {
+      stop("weights must be a numeric vector with one value for every
          data category, or NULL")
   }
 
@@ -170,12 +139,7 @@ mo_plot_comp_distn_with_credint <- function(retval,cat_names=NULL,
       plottop <- ceiling(max(ci)/0.1)*0.1+0.01
     }
 
-
-
-
-
     # main barplot
-
     b <- barplot(sig, col=cat_cols_copy, xaxt="n", ylim=c(0,plottop*1.1),
                  border=NA, names.arg=rep("", ncat), xpd=F, las=1,
                  main=plot_title[ii],...)
@@ -214,7 +178,7 @@ mo_plot_comp_distn_with_credint <- function(retval,cat_names=NULL,
 #' @param ... Other arguments to plot
 #' @importFrom beeswarm beeswarm
 #' @export
-mo_plot_sig_exposure_for_dp <- function(retval, hdpsample, input.catalog,
+plot_sig_exposure_for_dp <- function(retval, hdpsample, input.catalog,
                                         col_comp = NULL,
                                         incl_numdata_plot=TRUE,
                                         ylab_numdata="Number of data items",
@@ -251,7 +215,6 @@ mo_plot_sig_exposure_for_dp <- function(retval, hdpsample, input.catalog,
     stop("incl_numdata_plot must be TRUE or FALSE")
   }
 
-
   # save pre-existing par conditions, and reset on exit
   par_old <- par(no.readonly=TRUE)
   on.exit(par(par_old), add=TRUE)
@@ -284,8 +247,6 @@ mo_plot_sig_exposure_for_dp <- function(retval, hdpsample, input.catalog,
   inc <- which(rowSums(exposures, na.rm=T)>0)
 
   num_leg_col <- floor(sqrt(length(inc)))
-
-
 
   if (incl_numdata_plot){
     par(mfrow=c(2, 1), mar=mar, oma=oma, cex.axis=cex.axis, las=2)
@@ -382,15 +343,15 @@ mo_plot_sig_exposure_for_dp <- function(retval, hdpsample, input.catalog,
 #######################################################################
 #######################################################################
 
-#' Plot size for each signature for all posterior samples
-#' @param retval an object return from \code{\link{extract_ccc_cdc_from_hdp}}
+#' Plot the number of mutations in each "component" (set of mutations due to one signature).
+#'
+#' @param retval An object returned from \code{\link{extract_ccc_cdc_from_hdp}}
 #' @param xlab Horizontal axis label
 #' @param ylab Vertical axis label
-#' @param ... Other arguments to plot
 #' @export
 #' @importFrom ggplot2 ggplot geom_boxplot xlab ylab
 #'
-mo_plot_comp_size <- function(retval, xlab="Component",
+plot_num_mutations_per_comp <- function(retval, xlab="Component",
                               ylab="Number of data items", ...){
 
   # input checks

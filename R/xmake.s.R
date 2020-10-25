@@ -1,4 +1,4 @@
-#' Return a function to calculate the unsigned Stirling numbers of the first kind
+#' Return a function to calculate the unsigned Stirling numbers of the first kind.
 #'
 #' @export
 #'
