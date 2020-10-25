@@ -7,13 +7,18 @@
 #'  threshold.
 #'
 #' @param hc.cutoff the height to cut hierarchical clustering tree
-#'
+
 #' @return A list with the elements \describe{
-#' clustered.spectrum = spectrum.df,
-#' \item{stats.post.samples}{}
-#' \item{spectrum.cdc}{}
-#' \item{each.chain.noise.cd}{A list of raw clusters that }
-#' \item{each.chain.noise.spectrum}{noise from each chain}
+#' \item{components}{Clusters profile as a data frame.Rows represent the categories and columns are index.
+#'                each cell contains number of items}
+#' \item{components.post.samples}{A data frame with two columns: one is the index and the other is number of posterior
+#'                              samples that extract raw clusters contributing to \code{components}}
+#' \item{components.cdc}{A categ_dp_counts matrix. Each row is a dp and each column corresponds to the cluster
+#'                     in \code{components}}
+#' \item{each.chain.noise.clusters}{A list of raw clusters that only found in one posterior sample of each chain.
+#'                              These clusters were selected before hierarchical clustering to save computational time}
+#' \item{each.chain.noise.cdc}{A categ_dp_counts matrix with each row is a dp and each column corresponds to
+#'                            the cluster in \code{each.chain.noise.clusters}}
 #' \item{multi.chains}{An \code{\link{hdpSampleChain-class}}
 #'    or \code{\link{hdpSampleMulti-class}}
 #'    object updated with component information
@@ -30,7 +35,7 @@
 #'
 #' @export
 
-extract_sigs_from_clusters <-  function(x,
+extract_components_from_clusters <-  function(x,
                                         cos.merge = 0.90,
                                         hc.cutoff = 0.12
                                       ){
@@ -194,14 +199,13 @@ extract_sigs_from_clusters <-  function(x,
   cosine.dist.df <- parallelDist::parallelDist(t(dataframe.normed),method = "cosine")
   cosine.dist.hctree <- stats::hclust(cosine.dist.df,method = "average")
 
-  ####decide best cutoff##########################################
-  #####cut hc tree until no clusters have cos.sim > cos.cutoff####
-
   # Find clusters composed of highly similar clusters
   clusters <- dendextend::cutree(cosine.dist.hctree,  h=hc.cutoff)
   spectrum.df <- merge_cols(as.matrix(dataframe),clusters)
   spectrum.stats <- aggregate(stats.dataframe[,2],by=list(clusters),sum)
   spectrum.cdc <- merge_cols(as.matrix(dp.dataframe),clusters)
+
+  #needs one step to merge clusters with high cosine similarities
 
   for (iter.index in 1:15) {
 
@@ -212,14 +216,11 @@ extract_sigs_from_clusters <-  function(x,
     clust_same <- (clust_cos > cos.merge & lower.tri(clust_cos))
     same <- which(clust_same, arr.ind=TRUE) # merge these columns
     if(length(same)==0){
-      #message("no more merging")
       break
     }else{
-      #message("extra merging")
       for (i in 1:nrow(same)){
         clust_label[same[i, 1]] <- clust_label[same[i, 2]]
       }
-      #remove(i)
       spectrum.df <- merge_cols(as.matrix(spectrum.df),clust_label)
       spectrum.stats <- aggregate(spectrum.stats[,2],by=list(clust_label),sum)
       spectrum.cdc <- merge_cols(as.matrix(spectrum.cdc),clust_label)
@@ -230,11 +231,11 @@ extract_sigs_from_clusters <-  function(x,
   return(
     invisible(
       list(
-        clustered.spectrum = spectrum.df,
-        stats.post.samples = spectrum.stats,
-        spectrum.cdc = spectrum.cdc,
+        components = spectrum.df,
+        components.post.samples = spectrum.stats,
+        components.cdc = spectrum.cdc,
         each.chain.noise.cdc = each.chain.noise.cdc,
-        each.chain.noise.spectrum = each.chain.noise.spectrum,
+        each.chain.noise.clusters = each.chain.noise.spectrum,
         multi.chains = x,
         nsamp = nsamp)))
 }
