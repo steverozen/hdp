@@ -47,17 +47,17 @@ Imports:
     stats,
     beeswarm,
     Rcpp,
-    RcppArmadillo
+    RcppArmadillo,
+    flexclust,
+    parallelDist
 Suggests:
     clue,
-    flexclust,
     testthat,
     RColorBrewer,
     knitr,
     rmarkdown,
     BiocStyle,
-    devtools,
-    parallelDist
+    devtools
 Collate:
     'aaa-classes-input.R'
     'aaa-classes-output.R'
