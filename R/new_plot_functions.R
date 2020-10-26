@@ -156,13 +156,14 @@ plot_component_with_credint <-
 #'
 #' @param retval An object return from \code{\link{extract_ccc_cdc_from_hdp}}
 #'
+#' @export
 plot_component_posterior_samples <- function(components,
                                              retval){
-  for(i in 1:ncol(signatures)){
-    chain <- signatures <- exposures <- NULL
+  for(i in 1:ncol(components)){
+    chain <- exposures <- sequence <- NULL
     summary.cluster <- retval[[i]][["summary.chain.info"]]
     colnames(summary.cluster) <- c("chain","sample","sequence","exposures")
-    cluster.name <- colnames(signatures)[i]
+    cluster.name <- colnames(components)[i]
     plot.1 <- ggplot2::ggplot(data=summary.cluster, ggplot2::aes(x=sample, y=sequence, group=chain,color=chain)) +
       ggplot2::geom_point()+ggplot2::ggtitle(paste0(cluster.name," in Gibbs sample")) + ggplot2::xlab("Posterior.Sample") +  ggplot2::ylab("Chain")
     plot(plot.1)
