@@ -1,35 +1,52 @@
-#' Extract components and exposures from multiple posterior sample chains
-#' This function returns components with high confidence, moderate confidence and possible noise
+#' Extract components and exposures from multiple posterior sample chains.
+#'
+#' This function returns components in which we have high confidence, moderate confidence, and little confidence
+#' (lkely noise).
 #'
 #' @param multi.chains.retval A list of objects returned from \code{\link[mSigHdp]{CombineChainsAndExtractSigs}}.
 #'
-#' @param confident.prop components with at least \code{confident.prop} of posterior samples are high confident signatures
+#' @param confident.prop Components found in >= \code{confident.prop} of
+#'   posterior samples are high confidence components.
 #'
-#' @param noise.prop components with less than \code{noise.prop} of posterior samples are noise signatures
+#' @param noise.prop Components found in < \code{noise.prop} of posterior samples are considered noise components.
 #'
-#' @param verbose if TRUE, return messages
+#' @param verbose if TRUE, generate progress messages.
 #'
-#' @return Invisibly, a list with the following elements:\describe{
+#' @return In the information that follows, a "component" is
+#'  the union of multiple raw clusters of mutations (in the case of mutational
+#'  signature analysis). Invisibly, a list with the following elements: \describe{
 #'
-#' \item{high_confident_components}{The components found in more than \code{confident.prop} of posterior samples.
-#'                                The components that are profiles as a matrix;rows are catalogy types(features), columns are index.}
-#' \item{high_confident_components_post_number}{number of posterior samples corresponding
-#'                                            to each cluster in \code{high_confident_components}.}
-#' \item{high_confident_components_cdc}{categ_dp_counts matrix;rows are dps, columns correspond
-#'                                    to each cluster in \code{high_confident_components}}
-#' \item{moderate_components}{The components found in more than \code{noise.prop} but less than \code{confident.prop} of posterior samples.
-#'                          The components that are profiles as a matrix; rows are catalogy types(features),columns are index.}
-#' \item{moderate_components_post_number}{number of posterior samples corresponding to each cluster in
-#'                                           \code{moderate_components}.}
-#' \item{moderate_components_cdc}{categ_dp_counts matrix;rows are dps, columns correspond to each cluster
-#'                                    in \code{moderate_components}}
-#' \item{noise_components}{The components found in less than \code{noise.prop} of posterior samples.
-#'                      The components that are profiles as a matrix;rows are catalogy types(features), columns are index.}
-#' \item{noise_components_post_number}{number of posterior samples corresponding to each cluster in
-#'                                           \code{noise_components}.}
-#' \item{noise_components_cdc}{categ_dp_counts matrix;rows are dps, columns correspond to each cluster
-#'                                    in \code{noise_components}}
-#' \item{extracted.retval}{A list of objects returned from \code{\link[mSigHdp]{CombineChainsAndExtractSigs}}}
+#' \item{high_confident_components}{A data frame containing the
+#'    components found in >= \code{confident.prop} of posterior samples. Each column is
+#'    a component; in the case of mutational signatures the rows are mutation types.}
+#'
+#' \item{high_confident_components_post_number}{A data frame
+#'   in which the first column contains the index of a column in \code{high_confident_components}
+#'  and the second column contains the number of posterior samples that
+#'  contributed to that component.}
+#'
+#' \item{high_confident_components_cdc}{A matrix in which each row
+#'  corresponds to one of the Dirichlet processes, and each column
+#'  corresponds to one component in \code{high_confident_components}.
+#'  In the case of mutational signature analysis, most of the columns
+#'  correspond to an input biological sample (e.g. individual tumor).}
+#'
+#' \item{moderate_components}{Analogous to \code{high_confident_compents} except for
+#'  components with constituent raw clusters found in >= \code{noise.prop} and
+#'   < \code{confident.prop} posterior samples.}
+#'
+#' \item{moderate_components_post_number}{Analogous to \code{high_confident_components_post_number}.}
+#'
+#' \item{moderate_components_cdc}{Analogous to \code{high_confident_components_cdc}.}
+#'
+#' \item{noise_components}{Analogous to \code{high_confident_compents} except for
+#'  components with constituent raw clusters found in  < \code{noise.prop} posterior samples.}
+#'
+#' \item{noise_components_post_number}{Analogous to \code{high_confident_components_post_number}.}
+#'
+#' \item{noise_components_cdc}{Analogous to \code{high_confident_components_cdc}.}
+#'
+#' \item{extracted.retval}{A list of objects returned from \code{\link[mSigHdp]{CombineChainsAndExtractSigs}}.}
 #'
 #' }
 #'
