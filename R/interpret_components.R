@@ -97,7 +97,7 @@ interpret_components <- function(multi.chains.retval,
                         moderate_components_cdc                 = moderate_components_cdc,
                         noise_components                        = noise_components,
                         noise_components_post_number            = noise_components_post_number,
-                        noise_components_cdc                    = noise_components_cdc,
+                        noise_components_cdc                    = noise_components_cdc
                         )))
 
 }
