@@ -68,7 +68,7 @@ interpret_components <- function(multi.chains.retval,
   high_confident_components_post_number <- components_post_number[which(components_post_number[,2]>=(confident.prop*nsamp)),]
   high_confident_components_cdc <- components_cdc[,which(components_post_number[,2]>=(confident.prop*nsamp))]
   #the components with more than noise.prop nsamples but less
-  #than confident.prop nsamples are selected as components with
+  #than confident.prop samples are selected as components with
   #moderate confidence
   moderate_components <- components_category_counts[,intersect(which(components_post_number[,2]>=(noise.prop*nsamp)),which(components_post_number[,2]<(confident.prop*nsamp)))]
   moderate_components_post_number <- components_post_number[intersect(which(components_post_number[,2]>=(noise.prop*nsamp)),which(components_post_number[,2]<(confident.prop*nsamp))),]
@@ -98,7 +98,7 @@ interpret_components <- function(multi.chains.retval,
                         noise_components                        = noise_components,
                         noise_components_post_number            = noise_components_post_number,
                         noise_components_cdc                    = noise_components_cdc,
-                        extracted.retval                        = multi.chains.retval)))
+                        )))
 
 }
 
