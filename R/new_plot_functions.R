@@ -18,19 +18,27 @@ extract_ccc_cdc_from_hdp <- function(spectrum,
 
 
   for(chain in 1:length(ccc_0)){
-    ccc_unlist <- do.call(cbind,ccc_0[[chain]])
-    cdc_unlist <- do.call(cbind,cdc_0[[chain]])
 
     temp.chain <- data.frame(matrix(nrow=length(ccc_0[[chain]]),ncol=3))
     temp.chain[,1] <- chain
-    temp.chain[,2] <- 0
+    temp.chain[,2] <-  temp.chain[,4] <- 0
     temp.chain[,3] <- c(1:nrow(temp.chain))
 
-    cos.sims <- apply(ccc_unlist,2,function(x){lsa::cosine(x,spectrum)})
-    spectrum.ccc <- cbind(spectrum.ccc,ccc_unlist[,cos.sims>cos.merge])
-    temp.chain[cos.sims>cos.merge,2] <- 1
-    temp.chain[cos.sims>cos.merge,4] <- colSums(ccc_unlist[,cos.sims>cos.merge])
-    summary.chain.info <- rbind(summary.chain.info,temp.chain)
+    for(sample in 1:length(ccc_0[[chain]])){
+
+      ccc_0_temp <- ccc_0[[chain]][[sample]]
+
+      cos.sims <- apply(ccc_0_temp,2,function(x){lsa::cosine(x,spectrum)})
+      if(sum(cos.sims>cos.merge)>0){
+        spectrum.ccc <- cbind(spectrum.ccc,ccc_0_temp[,cos.sims>cos.merge])
+        temp.chain[sample,2] <- chain
+        temp.chain[sample,4] <- sum(colSums(ccc_0_temp[,cos.sims>cos.merge,drop=F]))
+        summary.chain.info <- rbind(summary.chain.info,temp.chain)
+      }
+
+    }
+
+
 
   }
 
@@ -164,11 +172,11 @@ plot_component_posterior_samples <- function(components,
     summary.cluster <- retval[[i]][["summary.chain.info"]]
     colnames(summary.cluster) <- c("chain","sample","sequence","exposures")
     cluster.name <- colnames(components)[i]
-    plot.1 <- ggplot2::ggplot(data=summary.cluster, ggplot2::aes(x=sample, y=sequence, group=chain,color=chain)) +
+    plot.1 <- ggplot2::ggplot(data=summary.cluster, ggplot2::aes(x=sequence, y=sample, group=chain,color=chain)) +
       ggplot2::geom_point()+ggplot2::ggtitle(paste0(cluster.name," in Gibbs sample")) + ggplot2::xlab("Posterior.Sample") +  ggplot2::ylab("Chain")
     plot(plot.1)
 
-    plot.2 <- ggplot2::ggplot(data=summary.cluster, ggplot2::aes(x=sample, y=exposures, group=chain,color=chain)) +
+    plot.2 <- ggplot2::ggplot(data=summary.cluster, ggplot2::aes(x=sequence, y=exposures, group=chain,color=chain)) +
       ggplot2::geom_point()+ggplot2::ggtitle(paste0("exposures of ",cluster.name," in Gibbs sample"))+ ggplot2::xlab("Posterior.Sample") +  ggplot2::ylab("Exposure")
     plot(plot.2)
   }
