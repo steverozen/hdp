@@ -33,11 +33,11 @@ extract_ccc_cdc_from_hdp <- function(spectrum,
         spectrum.ccc <- cbind(spectrum.ccc,ccc_0_temp[,cos.sims>cos.merge])
         temp.chain[sample,2] <- chain
         temp.chain[sample,4] <- sum(colSums(ccc_0_temp[,cos.sims>cos.merge,drop=F]))
-        summary.chain.info <- rbind(summary.chain.info,temp.chain)
+
       }
 
     }
-
+    summary.chain.info <- rbind(summary.chain.info,temp.chain)
 
 
   }
@@ -59,7 +59,7 @@ extract_ccc_cdc_from_hdp <- function(spectrum,
   return(invisible(list(spectrum.ccc = spectrum.ccc,
                         ccc_mean = ccc_mean,
                         ccc_credint = ccc_credint,
-                       summary.chain.info=summary.chain.info)))
+                        summary.chain.info=summary.chain.info)))
 }
 
 #' Plot signatures and their 95\% credible intervals
