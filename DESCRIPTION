@@ -49,9 +49,9 @@ Imports:
     Rcpp,
     RcppArmadillo,
     flexclust,
-    parallelDist
+    parallelDist,
+    clue
 Suggests:
-    clue,
     testthat,
     RColorBrewer,
     knitr,
