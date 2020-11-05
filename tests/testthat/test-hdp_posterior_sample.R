@@ -14,21 +14,23 @@ test_that("hdp_posterior_sample", {
 
 
   retvalx <- hdp_posterior_sample(post.input      = reg$retvalx,
-                                  post.n          = 15,
+                                  post.n          = 20,
                                   post.space      = 10,
                                   post.cpiter     = 3,
                                   seed            = 44,
-                                  post.verbosity  = 0)
+                                  post.verbosity  = 0,
+                                  checkpoint = T)
 
   retvalx.extend <- hdp_posterior_sample(post.input      = retvalx,
-                                         post.n          = 15,
+                                         post.n          = 20,
                                          post.space      = 10,
                                          post.cpiter     = 3,
                                          seed            = 44,
-                                         post.verbosity  = 0)
+                                         post.verbosity  = 0,
+                                         checkpoint = T)
 
-  # save(retvalx, file = "hdp.posterior.sample.expected.Rdata")
-  # save(retvalx.extend, file = "extend.hdp.posterior.sample.expected.Rdata")
+   save(retvalx, file = "hdp.posterior.sample.expected.Rdata")
+   save(retvalx.extend, file = "extend.hdp.posterior.sample.expected.Rdata")
 
   expect_equal(retvalx, reg2$retvalx)
   expect_equal(retvalx.extend, reg3$retvalx.extend)

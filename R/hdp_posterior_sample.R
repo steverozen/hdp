@@ -17,6 +17,7 @@
 #'  random seed from 1 -- 10^7, reported in the output.
 #' @param post.verbosity Verbosity of debugging statements.
 #'  0 (least verbose) -- 4 (most verbose). 0 highly recommended - only change for debugging small examples.
+#' @param checkpoint If \code{TRUE}, a checkpoint will be saved for every 10 posterior samples
 #' @return A hdpSampleChain object with the salient information from each
 #'  posterior sample. See \code{\link{hdpSampleChain-class}}
 #' @seealso \code{\link{hdp_multi_chain}}, \code{\link{hdp_extract_components}},
@@ -30,7 +31,8 @@ hdp_posterior_sample <- function(post.input,
                                  post.space,
                                  post.cpiter=1,
                                  seed=sample(1:10^7, 1),
-                                 post.verbosity=0){
+                                 post.verbosity=0,
+                                 checkpoint=F){
 
   set.seed(seed) ##set.seed in the function when running parallel
 
@@ -106,6 +108,42 @@ hdp_posterior_sample <- function(post.input,
       print(sprintf("Current sampling: %1.1f mins;Estimated Time of Completion: %1.1f mins",
                     elapsedtime, elapsedtime / curriter * totiter))
       prevtime <- tracktime
+    }
+    if(checkpoint){
+      if(samp %% 10 == 0){
+        message("Checkpoint after collecting ",samp," posterior samples")
+        numclass <- sapply(sample, function(x) x$numclass)
+        classqq <- lapply(sample, function(x) x$classqq)
+        classnd <- lapply(sample, function(x) as(x$classnd, "dgCMatrix"))
+        alpha <- t(sapply(sample, function(x) x$alpha))
+
+        hdp <- as.hdpState(hdplist)
+
+        ans <- new("hdpSampleChain",
+                   seed = as.integer(seed),
+
+                   ##changing names here cause a check error in hdpx::new
+                   settings = list(burnin       = burnin,
+                                   n            = samp,
+                                   space        = post.space,
+                                   cpiter       = post.cpiter),
+                   hdp = hdp,
+                   lik = all.lik,
+                   numcluster = numclass,
+                   cp_values = alpha,
+                   clust_categ_counts = classqq,
+                   clust_dp_counts = classnd,
+                   numcomp = as.integer(NULL),
+                   prop.ex = as.numeric(NULL),
+                   comp_cos_merge = as.numeric(NULL),
+                   comp_categ_counts = list(),
+                   comp_dp_counts = list(),
+                   comp_categ_distn = list(),
+                   comp_dp_distn = list())
+        save(ans,
+             file = paste0("posterior.checkpoint.", seed, ".Rdata"))
+
+      }
     }
   }
 

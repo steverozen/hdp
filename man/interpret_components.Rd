@@ -56,11 +56,9 @@ In the information that follows, a "component" is
 
 \item{noise_components_cdc}{Analogous to \code{high_confident_components_cdc}.}
 
-\item{extracted.retval}{A list of objects returned from \code{\link[mSigHdp]{CombineChainsAndExtractSigs}}.}
-
 }
 }
 \description{
 This function returns components in which we have high confidence, moderate confidence, and little confidence
-(lkely noise).
+(likely noise).
 }

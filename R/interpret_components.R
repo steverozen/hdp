@@ -1,7 +1,7 @@
 #' Extract components and exposures from multiple posterior sample chains.
 #'
 #' This function returns components in which we have high confidence, moderate confidence, and little confidence
-#' (lkely noise).
+#' (likely noise).
 #'
 #' @param multi.chains.retval A list of objects returned from \code{\link[mSigHdp]{CombineChainsAndExtractSigs}}.
 #'
@@ -45,8 +45,6 @@
 #' \item{noise_components_post_number}{Analogous to \code{high_confident_components_post_number}.}
 #'
 #' \item{noise_components_cdc}{Analogous to \code{high_confident_components_cdc}.}
-#'
-#' \item{extracted.retval}{A list of objects returned from \code{\link[mSigHdp]{CombineChainsAndExtractSigs}}.}
 #'
 #' }
 #'

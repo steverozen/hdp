@@ -10,7 +10,8 @@ hdp_posterior_sample(
   post.space,
   post.cpiter = 1,
   seed = sample(1:10^7, 1),
-  post.verbosity = 0
+  post.verbosity = 0,
+  checkpoint = F
 )
 }
 \arguments{
@@ -27,6 +28,8 @@ random seed from 1 -- 10^7, reported in the output.}
 
 \item{post.verbosity}{Verbosity of debugging statements.
 0 (least verbose) -- 4 (most verbose). 0 highly recommended - only change for debugging small examples.}
+
+\item{checkpoint}{If \code{TRUE}, a checkpoint will be saved for every 10 posterior samples}
 }
 \value{
 A hdpSampleChain object with the salient information from each
