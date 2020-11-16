@@ -109,6 +109,8 @@ extract_components_from_clusters <-  function(x,
   #######merge clusters with high cos.sim in one posterior sample#########
   ########################################################################
   first_merge <- function(ccc,cdc){
+    ccc <- data.frame(ccc)
+    cdc <- data.frame(cdc)
     clust_label <- 1:ncol(ccc)
     clust_cos <- lsa::cosine(ccc)
     clust_same <- (clust_cos > 0.99 & lower.tri(clust_cos))
@@ -139,6 +141,8 @@ extract_components_from_clusters <-  function(x,
   ########################################################################
 
   cosmergechain <- function(ccc,cdc){
+    ccc <- data.frame(ccc)
+    cdc <- data.frame(cdc)
     clust_cos <- cosCpp(as.matrix(ccc))
     clust_label <- c(1:ncol(ccc))
 
