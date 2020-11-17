@@ -73,8 +73,8 @@ interpret_components <- function(multi.chains.retval,
   nsamp <-  multi.chains.retval$nsamp
   components_cdc <- multi.chains.retval$components.cdc
 
-  components_category_counts <- components_category_counts[,order(components_post_number[,2],decreasing=T)]
-  components_cdc <- components_cdc[,order(components_post_number[,2],decreasing=T)]
+  components_category_counts <- components_category_counts[,order(components_post_number[,2],decreasing=T),drop=F]
+  components_cdc <- components_cdc[,order(components_post_number[,2],decreasing=T),drop=F]
   components_post_number <- components_post_number[order(components_post_number[,2],decreasing=T),]
 
   #the components with more than confident.prop nsamples are

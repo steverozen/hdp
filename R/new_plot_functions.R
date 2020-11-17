@@ -12,7 +12,7 @@ extract_ccc_cdc_from_hdp <- function(spectrum,
                                      cdc_0,
                                      cos.merge = 0.90){
 
-  spectrum.ccc <- data.frame(matrix(nrow=nrow(ccc_0[[1]][[1]]),ncol=0))
+  spectrum.ccc <- data.frame(matrix(nrow=nrow(data.frame(ccc_0[[1]][[1]])),ncol=0))
   summary.chain.info <- data.frame(matrix(ncol=3,nrow=0))
 
 
@@ -28,13 +28,21 @@ extract_ccc_cdc_from_hdp <- function(spectrum,
 
       ccc_0_temp <- ccc_0[[chain]][[sample]]
 
-      cos.sims <- apply(ccc_0_temp,2,function(x){lsa::cosine(x,spectrum)})
-      if(sum(cos.sims>cos.merge)>0){
-        spectrum.ccc <- cbind(spectrum.ccc,ccc_0_temp[,cos.sims>cos.merge])
-        temp.chain[sample,2] <- chain
-        temp.chain[sample,4] <- sum(colSums(ccc_0_temp[,cos.sims>cos.merge,drop=F]))
+      if(!is.null(ncol(ccc_0_temp))){
+        cos.sims <- apply(ccc_0_temp,2,function(x){lsa::cosine(x,spectrum)})
+        if(sum(cos.sims>cos.merge)>0){
+          spectrum.ccc <- cbind(spectrum.ccc,ccc_0_temp[,cos.sims>cos.merge])
+          temp.chain[sample,2] <- chain
+          temp.chain[sample,4] <- sum(colSums(ccc_0_temp[,cos.sims>cos.merge,drop=F]))
 
+        }
+      }else{
+        spectrum.ccc <- cbind(spectrum.ccc,data.frame(ccc_0_temp))
+        temp.chain[sample,2] <- chain
+        temp.chain[sample,4] <- sum(colSums(data.frame(ccc_0_temp)))
       }
+
+
 
     }
     summary.chain.info <- rbind(summary.chain.info,temp.chain)

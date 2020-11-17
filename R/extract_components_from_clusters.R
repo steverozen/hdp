@@ -109,21 +109,25 @@ extract_components_from_clusters <-  function(x,
   #######merge clusters with high cos.sim in one posterior sample#########
   ########################################################################
   first_merge <- function(ccc,cdc){
-    ccc <- data.frame(ccc)
-    cdc <- data.frame(cdc)
-    clust_label <- 1:ncol(ccc)
-    clust_cos <- lsa::cosine(ccc)
-    clust_same <- (clust_cos > 0.99 & lower.tri(clust_cos))
-    same <- which(clust_same, arr.ind=TRUE) # merge these columns
-    if (length(same)>0){
-      for (index in 1:nrow(same)){
-        clust_label[same[index, 1]] <- clust_label[same[index, 2]]
+    if(is.vector(ccc)){
+      return(list(ccc=ccc,cdc=cdc))
+    }else{
+
+      clust_label <- 1:ncol(ccc)
+      clust_cos <- lsa::cosine(ccc)
+      clust_same <- (clust_cos > 0.99 & lower.tri(clust_cos))
+      same <- which(clust_same, arr.ind=TRUE) # merge these columns
+      if (length(same)>0){
+        for (index in 1:nrow(same)){
+          clust_label[same[index, 1]] <- clust_label[same[index, 2]]
+        }
       }
+
+      ccc <- merge_cols(ccc,clust_label)
+      cdc <- merge_cols(cdc,clust_label)
+      return(list(ccc=ccc,cdc=cdc))
     }
 
-    ccc <- merge_cols(ccc,clust_label)
-    cdc <- merge_cols(cdc,clust_label)
-    return(list(ccc=ccc,cdc=cdc))
   }
 
   for(i in 1:nch) {
@@ -141,8 +145,7 @@ extract_components_from_clusters <-  function(x,
   ########################################################################
 
   cosmergechain <- function(ccc,cdc){
-    ccc <- data.frame(ccc)
-    cdc <- data.frame(cdc)
+
     clust_cos <- cosCpp(as.matrix(ccc))
     clust_label <- c(1:ncol(ccc))
 
