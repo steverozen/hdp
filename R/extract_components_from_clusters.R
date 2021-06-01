@@ -167,9 +167,13 @@ extract_components_from_clusters <-  function(x,
     new.spectrum <- ccc_unlist[,which(stats$Freq>1)]
     new.cdc <- cdc_unlist[,which(stats$Freq>1)]
     new.stats <- stats[which(stats$Freq>1),]
-    noise.spectrum <- rowSums(ccc_unlist[,which(stats$Freq==1)])
-    noise.cdc <- rowSums(cdc_unlist[,which(stats$Freq==1)])
-    noise.stats <- sum(stats$Freq==1)
+    noise.spectrum <- noise.cdc <- noise.stats <- {}
+    if(sum(stats$Freq==1)>0){
+      noise.spectrum <- rowSums(ccc_unlist[,which(stats$Freq==1),drop=F])
+      noise.cdc <- rowSums(cdc_unlist[,which(stats$Freq==1),drop=F])
+      noise.stats <- sum(stats$Freq==1)
+    }
+
     return(list= list(spectrum     = new.spectrum,
                       spectrum_cdc = new.cdc,
                       spectrum_stats = new.stats,
