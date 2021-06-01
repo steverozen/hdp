@@ -36,9 +36,9 @@
 #' @export
 
 extract_components_from_clusters <-  function(x,
-                                        cos.merge = 0.90,
-                                        hc.cutoff = 0.12
-                                      ){
+                                              cos.merge = 0.90,
+                                              hc.cutoff = 0.12
+){
   if (class(x)=="hdpSampleChain") {
     message('Extracting components on single chain.A hdpSampleMulti object is recommended, see ?hdp_multi_chain')
     is_multi <- FALSE
@@ -180,7 +180,7 @@ extract_components_from_clusters <-  function(x,
                       noise.spectrum = noise.spectrum,
                       noise.cdc    = noise.cdc,
                       noise.stats  = noise.stats
-                      ))
+    ))
 
   }
 
@@ -198,8 +198,11 @@ extract_components_from_clusters <-  function(x,
     dataframe <- cbind(dataframe,summary[[i]]$spectrum)
     dp.dataframe <- cbind(dp.dataframe,summary[[i]]$spectrum_cdc)
     stats.dataframe <- rbind(stats.dataframe,summary[[i]]$spectrum_stats)
-    each.chain.noise.spectrum <- cbind(all.noise.spectrum,summary[[i]]$noise.spectrum)
-    each.chain.noise.cdc <- cbind(each.chain.noise.cdc,summary[[i]]$noise.cdc)
+    if(!is.null(summary[[i]]$noise.spectrum)){
+      each.chain.noise.spectrum <- cbind(all.noise.spectrum,summary[[i]]$noise.spectrum)
+      each.chain.noise.cdc <- cbind(each.chain.noise.cdc,summary[[i]]$noise.cdc)
+    }
+
   }
 
 
