@@ -1,8 +1,8 @@
 Package: hdpx
 Title: Hierarchical Dirichlet process for categorical count data, expanded
-Version: 0.3.200
+Version: 0.3.300
 Authors@R: c(person("Steve", "Rozen", email="steverozen@gmail.com", role="aut"),
-  person("Mo", "Liu", email="mo.liu@u.duke.nus.edu", role="aut"),
+  person("Mo", "Liu", email="liumolm@gmail.com", role="aut"),
   person("Nicola", "Roberts", email="nr3@sanger.ac.uk", role=c("aut", "cre")),
   person("Yee Whye", "Teh", role=c("aut", "cph")))
 Encoding: UTF-8

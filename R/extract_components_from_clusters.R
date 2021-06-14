@@ -7,6 +7,8 @@
 #'  threshold.
 #'
 #' @param hc.cutoff the height to cut hierarchical clustering tree
+#'
+#' @param hc.method the method for hierarchical clustering
 
 #' @return A list with the elements \describe{
 #' \item{components}{Clusters profile as a data frame.Rows represent the categories and columns are index.
@@ -37,7 +39,8 @@
 
 extract_components_from_clusters <-  function(x,
                                               cos.merge = 0.90,
-                                              hc.cutoff = 0.12
+                                              hc.cutoff = 0.12,
+                                              hc.method = "ward.D2"
 ){
   if (class(x)=="hdpSampleChain") {
     message('Extracting components on single chain.A hdpSampleMulti object is recommended, see ?hdp_multi_chain')
@@ -211,7 +214,7 @@ extract_components_from_clusters <-  function(x,
 
   dataframe.normed <- apply(dataframe,2,function(x)x/sum(x))
   cosine.dist.df <- parallelDist::parallelDist(t(dataframe.normed),method = "cosine")
-  cosine.dist.hctree <- stats::hclust(cosine.dist.df,method = "average")
+  cosine.dist.hctree <- stats::hclust(cosine.dist.df,method = hc.method)
 
   # Find clusters composed of highly similar clusters
   clusters <- dendextend::cutree(cosine.dist.hctree,  h=hc.cutoff)
