@@ -209,6 +209,33 @@ extract_components_from_clusters <-  function(x,
   }
 
 
+
+  clust_cos <- cosCpp(as.matrix(dataframe))
+  clust_label <- c(1:ncol(dataframe))
+  colnames(dataframe) <- c(1:ncol(dataframe))
+  colnames(dp.dataframe) <- c(1:ncol(dataframe))
+  clust_same <- (clust_cos > 0.99 & lower.tri(clust_cos))
+  same <- which(clust_same, arr.ind=TRUE) # merge these columns
+
+  while(length(same)>0){
+
+    for (i in 1:nrow(same)){
+      clust_label[same[i, 1]] <- clust_label[same[i, 2]]
+    }
+    dataframe <- merge_cols(as.matrix(dataframe),clust_label)
+    stats.dataframe <- aggregate(stats.dataframe[,2],by=list(clust_label),sum)
+    dp.dataframe <- merge_cols(as.matrix(dp.dataframe),clust_label)
+
+
+    clust_cos <- cosCpp(as.matrix(dataframe))
+    clust_label <- c(1:ncol(dataframe))
+    colnames(dataframe) <- c(1:ncol(dataframe))
+    colnames(dp.dataframe) <- c(1:ncol(dataframe))
+    clust_same <- (clust_cos > 0.99 & lower.tri(clust_cos))
+    same <- which(clust_same, arr.ind=TRUE) # merge these columns
+  }
+
+
   #dataframe <- dataframe[,stats.dataframe$Freq>1]##exclude spectrum that only extracted in 1 post sample in a chain, too many noisy clusters affect the final extraction
   #stats.dataframe <- stats.dataframe[stats.dataframe$Freq>1,]
 
@@ -223,27 +250,37 @@ extract_components_from_clusters <-  function(x,
   spectrum.cdc <- merge_cols(as.matrix(dp.dataframe),clusters)
 
   #needs one step to merge clusters with high cosine similarities
-
-  for (iter.index in 1:15) {
-
+  #comment this out first
+  if(F){
     clust_cos <- cosCpp(as.matrix(spectrum.df))
     clust_label <- c(1:ncol(spectrum.df))
     colnames(spectrum.df) <- c(1:ncol(spectrum.df))
     colnames(spectrum.cdc) <- c(1:ncol(spectrum.df))
     clust_same <- (clust_cos > cos.merge & lower.tri(clust_cos))
     same <- which(clust_same, arr.ind=TRUE) # merge these columns
-    if(length(same)==0){
-      break
-    }else{
+    while(length(same)>0){
+
       for (i in 1:nrow(same)){
         clust_label[same[i, 1]] <- clust_label[same[i, 2]]
       }
       spectrum.df <- merge_cols(as.matrix(spectrum.df),clust_label)
       spectrum.stats <- aggregate(spectrum.stats[,2],by=list(clust_label),sum)
       spectrum.cdc <- merge_cols(as.matrix(spectrum.cdc),clust_label)
+
+
+      clust_cos <- cosCpp(as.matrix(spectrum.df))
+      clust_label <- c(1:ncol(spectrum.df))
+      colnames(spectrum.df) <- c(1:ncol(spectrum.df))
+      colnames(spectrum.cdc) <- c(1:ncol(spectrum.df))
+      clust_same <- (clust_cos > 0.99 & lower.tri(clust_cos))
+      same <- which(clust_same, arr.ind=TRUE) # merge these columns
     }
-    # update clust_label vector to reflect the merging of columns.
+
+
   }
+
+
+
 
   return(
     invisible(
