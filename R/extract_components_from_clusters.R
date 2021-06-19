@@ -214,7 +214,7 @@ extract_components_from_clusters <-  function(x,
   clust_label <- c(1:ncol(dataframe))
   colnames(dataframe) <- c(1:ncol(dataframe))
   colnames(dp.dataframe) <- c(1:ncol(dataframe))
-  clust_same <- (clust_cos > 0.99 & lower.tri(clust_cos))
+  clust_same <- (clust_cos > 0.97 & lower.tri(clust_cos))
   same <- which(clust_same, arr.ind=TRUE) # merge these columns
 
   while(length(same)>0){
@@ -231,7 +231,7 @@ extract_components_from_clusters <-  function(x,
     clust_label <- c(1:ncol(dataframe))
     colnames(dataframe) <- c(1:ncol(dataframe))
     colnames(dp.dataframe) <- c(1:ncol(dataframe))
-    clust_same <- (clust_cos > 0.99 & lower.tri(clust_cos))
+    clust_same <- (clust_cos > 0.97 & lower.tri(clust_cos))
     same <- which(clust_same, arr.ind=TRUE) # merge these columns
   }
 
