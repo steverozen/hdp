@@ -8,7 +8,8 @@ extract_components_from_clusters(
   x,
   cos.merge = 0.9,
   hc.cutoff = 0.12,
-  hc.method = "ward.D2"
+  hc.method = "average",
+  hc = "agglomerative"
 )
 }
 \arguments{
@@ -21,6 +22,8 @@ threshold.}
 \item{hc.cutoff}{the height to cut hierarchical clustering tree}
 
 \item{hc.method}{the method for hierarchical clustering}
+
+\item{hc}{'agglomerative' or 'divisive'. For testing purpose now.}
 }
 \value{
 A list with the elements \describe{

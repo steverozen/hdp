@@ -9,6 +9,8 @@
 #' @param hc.cutoff the height to cut hierarchical clustering tree
 #'
 #' @param hc.method the method for hierarchical clustering
+#'
+#' @param hc 'agglomerative' or 'divisive'. For testing purpose now.
 
 #' @return A list with the elements \describe{
 #' \item{components}{Clusters profile as a data frame.Rows represent the categories and columns are index.
@@ -40,7 +42,8 @@
 extract_components_from_clusters <-  function(x,
                                               cos.merge = 0.90,
                                               hc.cutoff = 0.12,
-                                              hc.method = "ward.D2"
+                                              hc.method = "average",
+                                              hc = "agglomerative"
 ){
   if (class(x)=="hdpSampleChain") {
     message('Extracting components on single chain.A hdpSampleMulti object is recommended, see ?hdp_multi_chain')
@@ -241,7 +244,14 @@ extract_components_from_clusters <-  function(x,
 
   dataframe.normed <- apply(dataframe,2,function(x)x/sum(x))
   cosine.dist.df <- parallelDist::parallelDist(t(dataframe.normed),method = "cosine")
-  cosine.dist.hctree <- stats::hclust(cosine.dist.df,method = hc.method)
+  if(hc == "agglomerative"){
+    cosine.dist.hctree <- stats::hclust(cosine.dist.df,method = hc.method)
+  }
+  if(hc == "divisive"){
+    cosine.dist.hctree <- diana(x = cosine.dist.df,diss = T)
+    cosine.dist.hctree <- as.hclust(cosine.dist.hctree)
+  }
+
 
   # Find clusters composed of highly similar clusters
   clusters <- dendextend::cutree(cosine.dist.hctree,  h=hc.cutoff)
