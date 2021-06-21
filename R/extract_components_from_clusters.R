@@ -244,12 +244,15 @@ extract_components_from_clusters <-  function(x,
 
   dataframe.normed <- apply(dataframe,2,function(x)x/sum(x))
   cosine.dist.df <- parallelDist::parallelDist(t(dataframe.normed),method = "cosine")
+
+
   if(hc == "agglomerative"){
+    print(paste0("Performing ",hc, " hierarchical clustering"))
     cosine.dist.hctree <- stats::hclust(cosine.dist.df,method = hc.method)
-  }
-  if(hc == "divisive"){
-    cosine.dist.hctree <- diana(x = cosine.dist.df,diss = T)
-    cosine.dist.hctree <- as.hclust(cosine.dist.hctree)
+  }else if(hc == "divisive"){
+    print(paste0("Performing ",hc, " hierarchical clustering"))
+    cosine.dist.hctree.diana <- cluster::diana(x = cosine.dist.df,diss = T)
+    cosine.dist.hctree <- as.hclust(cosine.dist.hctree.diana)
   }
 
 

@@ -1,6 +1,6 @@
 Package: hdpx
 Title: Hierarchical Dirichlet process for categorical count data, expanded
-Version: 0.3.302
+Version: 0.3.303
 Authors@R: c(person("Steve", "Rozen", email="steverozen@gmail.com", role="aut"),
   person("Mo", "Liu", email="liumolm@gmail.com", role="aut"),
   person("Nicola", "Roberts", email="nr3@sanger.ac.uk", role=c("aut", "cre")),
@@ -37,6 +37,7 @@ URL: https://github.com/steverozen/hdpx
 BugReports: https://github.com/steverozen/hdpx/issues
 Imports:
     lsa,
+    cluster,
     methods,
     coda,
     dendextend,
